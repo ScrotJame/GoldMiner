@@ -68,16 +68,17 @@ public class Pod : MonoBehaviour
                 break;
             case StateMoc._click:
                 transform.Translate(Vector3.down * _scrollSpeed * Time.deltaTime);
-                Check();
-                if (Mathf.Abs(transform.position.y) > 8 || Mathf.Abs(transform.position.x) > 8)
+                if (Mathf.Abs(transform.position.y) > 5 || Mathf.Abs(transform.position.x) > 5)
                 {
                     _state = StateMoc._rewind;
                 }
                 break;
             case StateMoc._rewind:
                 transform.Translate(Vector3.up * (_scrollSpeed - _slow) * Time.deltaTime);
-                if (Mathf.Floor(transform.position.x) == Mathf.Floor(_fistPosition.x)
-                    && Mathf.Floor(transform.position.y) == Mathf.Floor(_fistPosition.y))
+
+                float tolerance = 0.1f; // Define a small tolerance value
+                if (Mathf.Abs(transform.position.x - _fistPosition.x) < tolerance
+                    && Mathf.Abs(transform.position.y - _fistPosition.y) < tolerance)
                 {
                     if (_transformPostion != null)
                     {
@@ -102,6 +103,14 @@ public class Pod : MonoBehaviour
         }
     }
 
+    private void ClampPosition()
+    {
+        Vector3 pos = transform.position;
+        Vector3 screenBounds = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, _mainCamera.transform.position.z));
+        pos.x = Mathf.Clamp(pos.x, -screenBounds.x, screenBounds.x);
+        pos.y = Mathf.Clamp(pos.y, -screenBounds.y, screenBounds.y);
+        transform.position = pos;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -157,7 +166,7 @@ public class Pod : MonoBehaviour
     private void Check()
     {
         Vector3 screenPosition = _mainCamera.WorldToViewportPoint(transform.position);
-        if (screenPosition.y < 0 || screenPosition.y > 1|| screenPosition.x < 0 || screenPosition.x > 1)
+        if (screenPosition.y < 0 || screenPosition.y > 1 || screenPosition.x < 0 || screenPosition.x > 1)
         {
             _scrollSpeed = Mathf.Abs(_scrollSpeed);
             transform.position = _fistPosition;
@@ -165,3 +174,4 @@ public class Pod : MonoBehaviour
         }
     }
 }
+
