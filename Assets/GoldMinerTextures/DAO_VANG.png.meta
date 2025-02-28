@@ -197,7 +197,10 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      DAO_VANG_0: 885975459300039828
+      DAO_VANG_1: -8951737145053399198
+      DAO_VANG_2: -8857130393644455541
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

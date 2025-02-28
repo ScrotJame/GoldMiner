@@ -6,23 +6,23 @@ public class Pod : MonoBehaviour
 {
     private float _angle, _potion;
     private bool _flagCollect, _hasScored;
-    private int _score, _count;
+    public int _score, _count;
     private bool isAlive = true;
     private float flag = 0;
 
     public static Pod _Podinstance;
     private DataObject goldData;
     private Animator _anim;
-    private AudioSource _audio;
-    private AudioClip scrollClip, gotClip, useBoomClip;
+        private AudioSource _audio;
+        private AudioClip scrollClip, gotClip, useBoomClip;
     private Rigidbody2D _rigidbody2D;
     private Camera _mainCamera;
-    private Vector3 _fistPosition;
-    private Transform _transformPostion;
+    public Vector3 _fistPosition;
+    public Transform _transformPostion;
 
-    [SerializeField] private float _scrollSpeed = 2.0f;
-    [SerializeField] private float _rotationSpeed = 2;
-    [SerializeField] private float _slow;
+    [SerializeField] public float _scrollSpeed = 2.0f;
+    [SerializeField] public float _rotationSpeed = 2;
+    [SerializeField] public float _slow;
 
     private void Start()
     {
@@ -34,6 +34,8 @@ public class Pod : MonoBehaviour
         useBoomClip = Resources.Load<AudioClip>("Sound/useBoom");
         _mainCamera = Camera.main;
         _fistPosition = transform.position;
+
+        
     }
 
     public void Awake()
@@ -48,10 +50,15 @@ public class Pod : MonoBehaviour
         _rewind,
     }
     public StateMoc _state = StateMoc._rotation;
-
+    
     void Update()
     {
         if (Time.timeScale == 0) return;
+        _HookGetObject();
+
+    }
+     protected virtual void _HookGetObject()
+    {
         switch (_state)
         {
             case StateMoc._rotation:
@@ -68,20 +75,20 @@ public class Pod : MonoBehaviour
                 break;
             case StateMoc._click:
                 transform.Translate(Vector3.down * _scrollSpeed * Time.deltaTime);
-                if (Mathf.Abs(transform.position.y) > 5 || Mathf.Abs(transform.position.x) > 5)
+                if (Mathf.Abs(transform.position.y) > 5 || Mathf.Abs(transform.position.x) > 9)
                 {
                     _state = StateMoc._rewind;
                 }
                 break;
             case StateMoc._rewind:
                 transform.Translate(Vector3.up * (_scrollSpeed - _slow) * Time.deltaTime);
-
-                float tolerance = 0.1f; // Define a small tolerance value
+                float tolerance = 0.1f; 
                 if (Mathf.Abs(transform.position.x - _fistPosition.x) < tolerance
                     && Mathf.Abs(transform.position.y - _fistPosition.y) < tolerance)
                 {
                     if (_transformPostion != null)
                     {
+                        //get position of gold
                         GoldBase gold = _transformPostion.GetComponent<GoldBase>();
                         _anim.SetBool("got", false);
                         Destroy(_transformPostion.gameObject);
@@ -89,6 +96,8 @@ public class Pod : MonoBehaviour
                         _flagCollect = false;
                         _score += gold.RewindObject.point;
                         _count++;
+
+                        //set score -> count +1
                         if (GameControll.instance != null)
                         {
                             GameControll.instance._getScore(_score);
@@ -103,16 +112,7 @@ public class Pod : MonoBehaviour
         }
     }
 
-    private void ClampPosition()
-    {
-        Vector3 pos = transform.position;
-        Vector3 screenBounds = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, _mainCamera.transform.position.z));
-        pos.x = Mathf.Clamp(pos.x, -screenBounds.x, screenBounds.x);
-        pos.y = Mathf.Clamp(pos.y, -screenBounds.y, screenBounds.y);
-        transform.position = pos;
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Gold"))
         {
@@ -153,8 +153,9 @@ public class Pod : MonoBehaviour
                 Debug.LogWarning("DataObject not found on " + collision.gameObject.name);
             }
 
-            // Hiệu ứng animation
+            // Hiệu ứng animation của Gold
             Animator goldAnim = collision.gameObject.GetComponent<Animator>();
+            Animator MineAnim= collision.gameObject.GetComponent<Animator>();
             if (goldAnim != null)
             {
                 _anim.SetBool("got", true);
@@ -163,15 +164,6 @@ public class Pod : MonoBehaviour
         }
     }
 
-    private void Check()
-    {
-        Vector3 screenPosition = _mainCamera.WorldToViewportPoint(transform.position);
-        if (screenPosition.y < 0 || screenPosition.y > 1 || screenPosition.x < 0 || screenPosition.x > 1)
-        {
-            _scrollSpeed = Mathf.Abs(_scrollSpeed);
-            transform.position = _fistPosition;
-            _state = StateMoc._rotation;
-        }
-    }
+    
 }
 

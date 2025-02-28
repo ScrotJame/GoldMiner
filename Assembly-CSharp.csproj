@@ -61,10 +61,13 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.38f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Miner.cs" />
     <Compile Include="Assets\Scripts\Spawn.cs" />
     <Compile Include="Assets\Scripts\GameControll.cs" />
+    <Compile Include="Assets\Pull.cs" />
     <Compile Include="Assets\Scripts\ObjectCollection\GoldBase.cs" />
     <Compile Include="Assets\Scripts\Pod.cs" />
+    <Compile Include="Assets\Scripts\LinePod.cs" />
     <Compile Include="Assets\Scripts\ObjectCollection\GoldMedium.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\BackgroundScale.cs" />
