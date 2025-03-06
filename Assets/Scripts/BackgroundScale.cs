@@ -1,20 +1,32 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BackgroundScale : MonoBehaviour
 {
     void Start()
     {
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        Vector3 scale = transform.localScale;
+        ScaleToScreen();
+    }
 
-        float spriteHeight = spriteRenderer.bounds.size.y;
-        float spriteWidth = spriteRenderer.bounds.size.x;
+    void ScaleToScreen()
+    {
+        //SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
-        float screenHeight = Camera.main.orthographicSize * 2f;
-        float screenWidth = screenHeight * Screen.width / Screen.height;
+        //if (sr == null)
+        //{
+        //    Debug.LogError("Không tìm thấy SpriteRenderer trên GameObject!");
+        //    return;
+        //}
 
-        scale.y = screenHeight / spriteHeight;
-        scale.x = screenWidth / spriteWidth;
-        transform.localScale = scale;
+        //float width = sr.bounds.size.x;
+        //float height = sr.bounds.size.y;
+
+        //float worldScreenHeight = Camera.main.orthographicSize * 3.5f;
+        //float worldScreenWidth = worldScreenHeight * Screen.width / Screen.height;
+
+        //Vector3 scale = transform.localScale;
+        //scale.x = worldScreenWidth / width;
+        //scale.y = worldScreenHeight / height;
+
+        //transform.localScale = scale;
     }
 }

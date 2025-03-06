@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: BigGold
   m_EditorClassIdentifier: 
   objectName: 
-  weight: 3
+  weight: 3.5
   point: 400

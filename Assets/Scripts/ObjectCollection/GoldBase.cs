@@ -37,4 +37,12 @@ public class GoldBase : MonoBehaviour
             _animator.SetBool("is_got", true);
         }
     }
+    private void OnDestroy()
+    {
+        LinePod linePod = FindObjectOfType<LinePod>();
+        if (linePod != null)
+        {
+            linePod.ResetHook();
+        }
+    }
 }

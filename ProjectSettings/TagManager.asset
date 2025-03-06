@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Gold
+  - TNT
   layers:
   - Default
   - TransparentFX
