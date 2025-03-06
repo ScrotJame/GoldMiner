@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,17 +8,15 @@ public class GameControll : MonoBehaviour
     public static GameControll instance;
 
     public Text _Time, Number, _Notif, BestScoreTxt;
+    private int initialTime;
     private int timeLeft;
     private Coroutine countdownCoroutine;
     [SerializeField] GameObject _MenuGamePanel, _GameNotifPanel;
-    public List<ItemData> purchasedItems = new List<ItemData>();
 
     public bool isAlive = true;
     public int count = 0;
     public Spawner spawner;
-    public Store gameStore;
     public ScoreControl scoreManager;
-    public StoreManager storeManager;
     private float scrollSpeedBoost;
 
     private void Awake()
@@ -36,22 +33,22 @@ public class GameControll : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if (purchasedItems == null)
-        {
-            purchasedItems = new List<ItemData>();
-            Debug.Log("purchasedItems was null, initialized in Awake.");
-        }
 
         if (scoreManager == null)
         {
             scoreManager = FindObjectOfType<ScoreControl>();
             if (scoreManager == null)
-            {
                 Debug.LogError("ScoreControl not found in the scene!");
-            }
         }
 
-        scoreManager.LoadPlayerData();
+        if (spawner == null)
+        {
+            spawner = FindObjectOfType<Spawner>();
+            if (spawner == null)
+                Debug.LogError("Spawner not found in the scene!");
+        }
+
+        scoreManager?.LoadPlayerData();
         InitializeLevel();
     }
 
@@ -67,6 +64,11 @@ public class GameControll : MonoBehaviour
 
     private void Start()
     {
+        if (_Time == null || Number == null || _Notif == null)
+        {
+            Debug.LogError("One or more UI references (_Time, Number, _Notif) are null in Start!");
+            return;
+        }
         StartCountdown();
         if (_MenuGamePanel != null) _MenuGamePanel.SetActive(false);
         if (_GameNotifPanel != null) _GameNotifPanel.SetActive(false);
@@ -74,12 +76,12 @@ public class GameControll : MonoBehaviour
 
     public bool SpendMoney(int amount)
     {
-        return scoreManager.SpendScore(amount);
+        return scoreManager != null && scoreManager.SpendScore(amount);
     }
 
     public void AddScore(int score)
     {
-        scoreManager.AddScore(score);
+        if (scoreManager != null) scoreManager.AddScore(score);
     }
 
     private void StartCountdown()
@@ -96,51 +98,62 @@ public class GameControll : MonoBehaviour
             countdownCoroutine = null;
         }
     }
-    public void UseItem(string itemName)
-    {
-        ItemData item = purchasedItems.Find(i => i.nameItem == itemName && !i.isEquipped);
-        if (item != null)
-        {
-            switch (item.nameItem)
-            {
-                case "Speed Boost":
-                    scrollSpeedBoost += 1f;
-                    item.isEquipped = true;
-                    Debug.Log("Used Speed Boost: " + scrollSpeedBoost);
-                    break;
-                case "Extra Time":
-                    timeLeft += 10;
-                    item.isEquipped = true;
-                    _SetTime(timeLeft);
-                    Debug.Log("Used Extra Time: " + timeLeft);
-                    break;
-                default:
-                    Debug.Log("No effect defined for: " + itemName);
-                    break;
-            }
-        }
-        else
-        {
-            Debug.Log("Item not found or already used: " + itemName);
-        }
-    }
+
+    //public void UseItem(string itemName)
+    //{
+    //    ItemData item = StoreManager.instance.purchasedItems.Find(i => i.nameItem == itemName && !i.isEquipped);
+    //    if (item != null)
+    //    {
+    //        switch (item.nameItem)
+    //        {
+    //            case "Speed Boost":
+    //                scrollSpeedBoost += 1f;
+    //                item.isEquipped = true;
+    //                Debug.Log("Used Speed Boost: " + scrollSpeedBoost);
+    //                break;
+    //            case "Extra Time":
+    //                timeLeft += 10;
+    //                item.isEquipped = true;
+    //                _SetTime(timeLeft);
+    //                Debug.Log("Used Extra Time: " + timeLeft);
+    //                break;
+    //            default:
+    //                Debug.Log("No effect defined for: " + itemName);
+    //                break;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Item not found or already used: " + itemName);
+    //    }
+    //}
+
     IEnumerator Countdown()
     {
         while (timeLeft > 0)
         {
-            _Time.text = timeLeft.ToString("F0");
+            if (_Time != null)
+                _Time.text = timeLeft.ToString("F0");
+            else
+            {
+                Debug.LogError("_Time is null in Countdown!");
+                yield break;
+            }
             yield return new WaitForSeconds(1f);
             timeLeft--;
         }
-        _Time.text = "0";
-        CheckMissionComplete(scoreManager.GetCurrentScore(), timeLeft);
+        if (_Time != null) _Time.text = "0";
+        if (scoreManager != null)
+            CheckMissionComplete(scoreManager.GetCurrentScore(), timeLeft);
     }
 
     private void InitializeLevel()
     {
-        timeLeft = 10;
+        initialTime = 60; 
+        timeLeft = initialTime;
         _SetTime(timeLeft);
-        scoreManager.InitializeScore(0, 1); // Khởi tạo điểm số và mục tiêu
+        if (scoreManager != null)
+            scoreManager.InitializeScore(0, 1000);
         _SetNumber();
     }
 
@@ -148,9 +161,7 @@ public class GameControll : MonoBehaviour
     {
         timeLeft = time;
         if (_Time != null)
-        {
             _Time.text = time.ToString();
-        }
     }
 
     private void _SetNumber()
@@ -165,22 +176,34 @@ public class GameControll : MonoBehaviour
 
     private void CheckMissionComplete(int score, int time)
     {
-        if (time <= 0 && score >= scoreManager.GetTargetScore())
+        if (time <= 0 && scoreManager != null && score >= scoreManager.GetTargetScore())
         {
-            _Notif.text = "Mission Complete!";
+            if (_Notif != null) _Notif.text = "Mission Complete!";
             StopCountdown();
             Time.timeScale = 0;
             AdvanceToNextLevel(score);
-            //SceneManager.LoadScene("Store");
-            SceneManager.LoadScene("GamePlay");
+            ResetGameForNewLevel(); // Reset trong cùng scene
         }
-        else if (time <= 0 && score < scoreManager.GetTargetScore())
+        else if (time <= 0 && scoreManager != null && score < scoreManager.GetTargetScore())
         {
-            _Notif.text = "Mission Failed! \n Do you want to try again?";
-            scoreManager.InitializeScore(0); // Reset điểm số
+            if (_Notif != null) _Notif.text = "Mission Failed! \n Do you want to try again?";
+            if (scoreManager != null) scoreManager.InitializeScore(0);
             Time.timeScale = 0;
             if (_GameNotifPanel != null) _GameNotifPanel.SetActive(true);
         }
+    }
+
+    private void ResetGameForNewLevel()
+    {
+        if (_MenuGamePanel != null) _MenuGamePanel.SetActive(false);
+        if (_GameNotifPanel != null) _GameNotifPanel.SetActive(false);
+        if (spawner != null)
+            spawner.ResetLevel();
+        else
+            Debug.LogError("Spawner is null in ResetGameForNewLevel!");
+        _SetNumber();
+        Time.timeScale = 1;
+        StartCountdown();
     }
 
     private void AdvanceToNextLevel(int score)
@@ -190,7 +213,6 @@ public class GameControll : MonoBehaviour
             Debug.LogError("scoreManager is null in AdvanceToNextLevel!");
             return;
         }
-
         if (spawner == null)
         {
             spawner = FindObjectOfType<Spawner>();
@@ -201,93 +223,34 @@ public class GameControll : MonoBehaviour
             }
         }
 
-        timeLeft = 60;
-        int newTargetScore = scoreManager.GetTargetScore() + score / 2;
-        timeLeft += 30;
+        initialTime += 20; 
+        timeLeft = initialTime;
+        int newTargetScore = (scoreManager.GetTargetScore() + score / 2) +500;
         scoreManager.SetTargetScore(newTargetScore);
         _SetTime(timeLeft);
-
-        spawner.ResetLevel();
-    }
-
-    // Load player data from PlayerPrefs
-    private void LoadPlayerData()
-    {
-        int itemCount = PlayerPrefs.GetInt("PurchasedItemCount", 0);
-        purchasedItems.Clear();
-        for (int i = 0; i < itemCount; i++)
-        {
-            ItemData item = new ItemData
-            {
-                id = PlayerPrefs.GetInt($"Item_{i}_id"),
-                nameItem = PlayerPrefs.GetString($"Item_{i}_name", ""),
-                price = PlayerPrefs.GetInt($"Item_{i}_price", 0),
-                currentStack = PlayerPrefs.GetInt($"Item_{i}_stack", 1),
-                maxStack = PlayerPrefs.GetInt($"Item_{i}_maxStack", 99),
-                isStackable = PlayerPrefs.GetInt($"Item_{i}_stackable", 1) == 1
-            };
-            purchasedItems.Add(item);
-        }
-        Debug.Log("Loaded: Score = " + scoreManager.GetCurrentScore() + ", Items = " + itemCount);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        SavePlayerData();
-        if (scene.name == "Store")
+        //if (scene.name == "Store" && StoreManager.instance != null)
+        //{
+        //    GameObject storeObj = GameObject.Find("Store");
+        //    if (storeObj != null)
+        //        StoreManager.instance.AssignStore(storeObj.GetComponent<Store>());
+        //}
+        //else 
+        if (scene.name == "GamePlay")
         {
-            GameObject storeObj = GameObject.Find("Store");
-            if (storeObj != null)
-            {
-                gameStore = storeObj.GetComponent<Store>();
-                if (gameStore != null)
-                {
-                    Debug.Log("GameControll - Assigned gameStore from StoreScene");
-                }
-                else
-                {
-                    Debug.LogWarning("Store script not found on 'Store' GameObject in StoreScene");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("Could not find 'Store' GameObject in StoreScene");
-            }
+            // Cập nhật lại tham chiếu nếu cần khi vào GamePlay
+            spawner = FindObjectOfType<Spawner>();
+            scoreManager = FindObjectOfType<ScoreControl>();
+            if (spawner == null) Debug.LogError("Spawner not found after scene load!");
+            if (scoreManager == null) Debug.LogError("ScoreManager not found after scene load!");
         }
     }
-    public void AddPurchasedItem(ItemData item)
-    {
-        purchasedItems.Add(item);
-        Debug.Log("Item added to GameControll: " + item.nameItem + ", Price: " + item.price);
-        SavePlayerData();
-    }
 
-
-    private void SavePlayerData()
-    {
-        PlayerPrefs.SetInt("PurchasedItemCount", purchasedItems.Count);
-        for (int i = 0; i < purchasedItems.Count; i++)
-        {
-            PlayerPrefs.SetInt($"Item_{i}_id", purchasedItems[i].id);
-            PlayerPrefs.SetString($"Item_{i}_name", purchasedItems[i].nameItem);
-            PlayerPrefs.SetInt($"Item_{i}_price", purchasedItems[i].price);
-            PlayerPrefs.SetInt($"Item_{i}_stack", purchasedItems[i].currentStack);
-            PlayerPrefs.SetInt($"Item_{i}_maxStack", purchasedItems[i].maxStack);
-            PlayerPrefs.SetInt($"Item_{i}_stackable", purchasedItems[i].isStackable ? 1 : 0);
-        }
-        PlayerPrefs.Save();
-        Debug.Log("Saved: Score = " + scoreManager.GetCurrentScore() + ", Items = " + purchasedItems.Count);
-    }
-    public void _HomeButton()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
-
-    public void _PlayAgainButton()
-    {
-        SceneManager.LoadScene("GamePlay");
-    }
-
+    public void _HomeButton() => SceneManager.LoadScene("MainMenu");
+    public void _PlayAgainButton() => SceneManager.LoadScene("GamePlay");
     public void _PlayButton()
     {
         if (_MenuGamePanel != null) _MenuGamePanel.SetActive(false);
@@ -295,7 +258,6 @@ public class GameControll : MonoBehaviour
         Time.timeScale = 1;
         StartCountdown();
     }
-
     public void _ContinueButton()
     {
         if (_MenuGamePanel != null) _MenuGamePanel.SetActive(false);
@@ -303,7 +265,6 @@ public class GameControll : MonoBehaviour
         Time.timeScale = 1;
         StartCountdown();
     }
-
     public void _StopButton()
     {
         Time.timeScale = 0;

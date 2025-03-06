@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class StoreManager : MonoBehaviour
 {
+    public static StoreManager instance;
     public Text MoneyUI;
     public Store[] StoreItemUI;
     public ShopItem[] ShopItems;
     public GameObject StorePanel;
     public GameObject[] ItemPrefab;
+    public List<ItemData> purchasedItems = new List<ItemData>();
 
     private int Money;
     private GameControll gameController;
@@ -56,8 +58,65 @@ public class StoreManager : MonoBehaviour
         LoadStoreUI();
         CheckPurchasable();
     }
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+            Debug.Log("StoreManager instance initialized.");
+        }
+        else if (instance != this)
+        {
+            Debug.Log("Duplicate StoreManager found, destroying: " + gameObject.name);
+            Destroy(gameObject);
+            return;
+        }
 
-    private void SpawnItemsInPanel()
+        if (purchasedItems == null)
+        {
+            purchasedItems = new List<ItemData>();
+        }
+        LoadPlayerData(); // Tải danh sách vật phẩm đã mua từ PlayerPrefs (nếu có)
+    }
+    private void SavePlayerData()
+    {
+        PlayerPrefs.SetInt("PurchasedItemCount", purchasedItems.Count);
+        for (int i = 0; i < purchasedItems.Count; i++)
+        {
+            PlayerPrefs.SetInt($"Item_{i}_id", purchasedItems[i].id);
+            PlayerPrefs.SetString($"Item_{i}_name", purchasedItems[i].nameItem);
+            PlayerPrefs.SetInt($"Item_{i}_price", purchasedItems[i].price);
+            PlayerPrefs.SetInt($"Item_{i}_stack", purchasedItems[i].currentStack);
+            PlayerPrefs.SetInt($"Item_{i}_maxStack", purchasedItems[i].maxStack);
+            PlayerPrefs.SetInt($"Item_{i}_stackable", purchasedItems[i].isStackable ? 1 : 0);
+        }
+        PlayerPrefs.Save();
+        Debug.Log("Saved purchased items: " + purchasedItems.Count);
+    }
+
+    // Tải dữ liệu từ PlayerPrefs
+    private void LoadPlayerData()
+    {
+        int itemCount = PlayerPrefs.GetInt("PurchasedItemCount", 0);
+        purchasedItems.Clear();
+        for (int i = 0; i < itemCount; i++)
+        {
+            ItemData item = new ItemData
+            {
+                id = PlayerPrefs.GetInt($"Item_{i}_id"),
+                nameItem = PlayerPrefs.GetString($"Item_{i}_name", ""),
+                price = PlayerPrefs.GetInt($"Item_{i}_price", 0),
+                currentStack = PlayerPrefs.GetInt($"Item_{i}_stack", 1),
+                maxStack = PlayerPrefs.GetInt($"Item_{i}_maxStack", 99),
+                isStackable = PlayerPrefs.GetInt($"Item_{i}_stackable", 1) == 1
+            };
+            purchasedItems.Add(item);
+        }
+        Debug.Log("Loaded purchased items: " + itemCount);
+    }
+
+private void SpawnItemsInPanel()
     {
         int totalToSpawn = Mathf.Min(maxObjects, ShopItems.Length);
         HashSet<int> spawnedIndices = new HashSet<int>();
@@ -204,7 +263,7 @@ public class StoreManager : MonoBehaviour
                 isStackable = true
             };
 
-            gameController.AddPurchasedItem(purchasedItem);
+            ///gameController.AddPurchasedItem(purchasedItem);
             Debug.Log("Bought item: " + ShopItems[index].title);
 
             GameObject itemToRemove = spawnedItems.Find(item => item != null && item.GetComponentsInChildren<Text>()[0].text == ShopItems[index].title);

@@ -5,9 +5,9 @@ public class Spawner : MonoBehaviour
 {
     public static Spawner instance;
     [SerializeField] private GameObject[] objectsToSpawn;
-    [SerializeField] private int maxAttempts = 30;
-    private float minSpawnDistance = 3f;
-    [SerializeField] private int minObjects = 4, maxObjects = 7;
+    [SerializeField] private int maxAttempts = 100;
+    private float minSpawnDistance = 1.5f;
+    [SerializeField] private int minObjects = 3, maxObjects = 7;
     private HashSet<Vector2> usedPositions = new HashSet<Vector2>();
 
     [SerializeField] private Vector2 spawnAreaMin = new Vector2(-6.8f, -4.5f);
@@ -16,6 +16,18 @@ public class Spawner : MonoBehaviour
     void Start()
     {
         SpawnObjects();
+    }
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
     private void SpawnObjects()
@@ -71,7 +83,10 @@ public class Spawner : MonoBehaviour
     {
         foreach (var obj in GameObject.FindObjectsOfType<GameObject>())
         {
-            if (System.Array.Exists(objectsToSpawn, element => element.name == obj.name))
+            string objName = obj.name.Replace("(Clone)", "").Trim();
+
+            // Kiểm tra nếu objName tồn tại trong objectsToSpawn
+            if (System.Array.Exists(objectsToSpawn, element => element.name == objName))
             {
                 Destroy(obj);
             }
@@ -82,4 +97,5 @@ public class Spawner : MonoBehaviour
 
         Debug.Log("New level has been created!");
     }
+
 }
