@@ -25,6 +25,7 @@ public class Pod : MonoBehaviour
     {
         Time.timeScale = 1;
         _state = StateMoc._rotation;
+        _animMiner = transform.root.GetComponent<Animator>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _audio = GetComponent<AudioSource>();
@@ -33,12 +34,16 @@ public class Pod : MonoBehaviour
         useBoomClip = Resources.Load<AudioClip>("Sound/useBoom");
         _mainCamera = Camera.main;
         _fistPosition = transform.position;
+
+        // Kiểm tra Animator
+        if (_anim == null)
+        {
+            Debug.LogError("Animator component not found on Pod!");
+        }
     }
 
     public void Awake()
     {
-        _animMiner = transform.root.GetComponent<Animator>();
-        _fistPosition = transform.position;
     }
 
     public enum StateMoc
@@ -60,7 +65,7 @@ public class Pod : MonoBehaviour
         switch (_state)
         {
             case StateMoc._rotation:
-                _animMiner.Play("MinerBaseState");
+                if (_animMiner != null) _animMiner.Play("MinerBaseState");
                 if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
                 {
                     _click = false;
@@ -96,16 +101,16 @@ public class Pod : MonoBehaviour
                         if (gold != null)
                         {
                             Destroy(_transformPostion.gameObject);
-                            _anim.SetBool("got", false);
-                            _animMiner.Play("MinerRewind");
+                            if (_anim != null) _anim.SetBool("got", false);
+                            if (_animMiner != null) _animMiner.Play("MinerRewind");
 
                             int goldPoints = gold.RewindObject.point;
-                            _score += goldPoints; // Cộng điểm cục bộ
+                            _score += goldPoints;
                             _count++;
 
                             if (ScoreControl.instance != null)
                             {
-                                ScoreControl.instance.AddScore(goldPoints); // Cộng điểm vào ScoreControl
+                                ScoreControl.instance.AddScore(goldPoints);
                                 Debug.Log("Score added: " + goldPoints + ", Total: " + ScoreControl.instance.GetCurrentScore());
                             }
                             else
@@ -116,7 +121,7 @@ public class Pod : MonoBehaviour
                         _transformPostion = null;
                     }
                     _state = StateMoc._rotation;
-                    _animMiner.Play("MinerBaseState");
+                    if (_animMiner != null) _animMiner.Play("MinerBaseState");
                 }
                 break;
         }
@@ -124,16 +129,16 @@ public class Pod : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Gold"))
+        if (collision.gameObject.CompareTag("Gold") || collision.gameObject.CompareTag("TNT"))
         {
-            Debug.Log("Got Gold!");
+            Debug.Log("Got " + collision.gameObject.tag + "!");
             _state = StateMoc._rewind;
             _transformPostion = collision.gameObject.transform;
             _transformPostion.SetParent(transform);
 
             if (_flagCollect) return;
             _flagCollect = true;
-            _animMiner.Play("MinerRoll");
+            if (_animMiner != null) _animMiner.Play("MinerRoll");
             GoldBase gold = collision.gameObject.GetComponent<GoldBase>();
             if (gold != null)
             {
@@ -148,7 +153,7 @@ public class Pod : MonoBehaviour
             if (_gold != null && _gold.RewindObject != null)
             {
                 _slow = _gold.RewindObject.weight;
-                Debug.Log($"Collected Gold! Weight: {_gold.RewindObject.weight}, Points: {_gold.RewindObject.point}");
+                Debug.Log($"Collected {collision.gameObject.tag}! Weight: {_gold.RewindObject.weight}, Points: {_gold.RewindObject.point}");
             }
             else
             {
@@ -158,44 +163,27 @@ public class Pod : MonoBehaviour
             Animator goldAnim = collision.gameObject.GetComponent<Animator>();
             if (goldAnim != null)
             {
-                _anim.SetBool("got", true);
+                if (_anim != null) _anim.SetBool("got", true);
                 goldAnim.SetBool("is_got", true);
             }
         }
-        if (collision.gameObject.CompareTag("TNT"))
+    }
+
+    public void ResetHookPosition()
+    {
+        transform.position = _fistPosition;
+        transform.rotation = Quaternion.identity;
+        _state = StateMoc._rotation;
+        _angle = 0;
+        _slow = 0;
+        _flagCollect = false;
+        if (_transformPostion != null)
         {
-            Debug.Log("Got TNT!");
-            _state = StateMoc._rewind;
-            _transformPostion = collision.gameObject.transform;
-            _transformPostion.SetParent(transform);
-            if (_flagCollect) return;
-            _flagCollect = true;
-            _animMiner.Play("MinerRoll");
-            GoldBase gold = collision.gameObject.GetComponent<GoldBase>();
-            if (gold != null)
-            {
-                if (gold.currentState == GoldBase.GoldState.Idle)
-                {
-                    gold.currentState = GoldBase.GoldState.BeingGrabbed;
-                    gold.currentState = GoldBase.GoldState.Collected;
-                }
-            }
-            GoldBase _gold = collision.gameObject.GetComponent<GoldBase>();
-            if (_gold != null && _gold.RewindObject != null)
-            {
-                _slow = _gold.RewindObject.weight;
-                Debug.Log($"Collected TNT! Weight: {_gold.RewindObject.weight}, Points: {_gold.RewindObject.point}");
-            }
-            else
-            {
-                Debug.LogWarning("DataObject not found on " + collision.gameObject.name);
-            }
-            Animator goldAnim = collision.gameObject.GetComponent<Animator>();
-            if (goldAnim != null)
-            {
-                _anim.SetBool("got", true);
-                goldAnim.SetBool("is_got", true);
-            }
+            Destroy(_transformPostion.gameObject);
+            _transformPostion = null;
         }
+        if (_anim != null) _anim.SetBool("got", false);
+        if (_animMiner != null) _animMiner.Play("MinerBaseState");
+        Debug.Log("Hook reset to initial position!");
     }
 }

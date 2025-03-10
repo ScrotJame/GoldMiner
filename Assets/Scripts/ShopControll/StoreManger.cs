@@ -15,6 +15,7 @@ public class StoreManager : MonoBehaviour
 
     private int Money;
     private GameControll gameController;
+    private GameManager gameManager;
     private List<GameObject> spawnedItems = new List<GameObject>();
 
     [SerializeField] private Vector2 spawnAreaMin = new Vector2(-6.3f, -1.14f);
@@ -34,7 +35,7 @@ public class StoreManager : MonoBehaviour
         if (gameController.scoreManager != null)
         {
             Money = gameController.scoreManager.GetCurrentScore();
-            MoneyUI.text = Money.ToString();
+            //MoneyUI.text = Money.ToString();
         }
         else
         {
@@ -64,57 +65,20 @@ public class StoreManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log("StoreManager instance initialized.");
         }
-        else if (instance != this)
+        else
         {
             Debug.Log("Duplicate StoreManager found, destroying: " + gameObject.name);
             Destroy(gameObject);
-            return;
         }
+    
 
         if (purchasedItems == null)
         {
             purchasedItems = new List<ItemData>();
         }
-        LoadPlayerData(); // Tải danh sách vật phẩm đã mua từ PlayerPrefs (nếu có)
     }
-    private void SavePlayerData()
-    {
-        PlayerPrefs.SetInt("PurchasedItemCount", purchasedItems.Count);
-        for (int i = 0; i < purchasedItems.Count; i++)
-        {
-            PlayerPrefs.SetInt($"Item_{i}_id", purchasedItems[i].id);
-            PlayerPrefs.SetString($"Item_{i}_name", purchasedItems[i].nameItem);
-            PlayerPrefs.SetInt($"Item_{i}_price", purchasedItems[i].price);
-            PlayerPrefs.SetInt($"Item_{i}_stack", purchasedItems[i].currentStack);
-            PlayerPrefs.SetInt($"Item_{i}_maxStack", purchasedItems[i].maxStack);
-            PlayerPrefs.SetInt($"Item_{i}_stackable", purchasedItems[i].isStackable ? 1 : 0);
-        }
-        PlayerPrefs.Save();
-        Debug.Log("Saved purchased items: " + purchasedItems.Count);
-    }
-
-    // Tải dữ liệu từ PlayerPrefs
-    private void LoadPlayerData()
-    {
-        int itemCount = PlayerPrefs.GetInt("PurchasedItemCount", 0);
-        purchasedItems.Clear();
-        for (int i = 0; i < itemCount; i++)
-        {
-            ItemData item = new ItemData
-            {
-                id = PlayerPrefs.GetInt($"Item_{i}_id"),
-                nameItem = PlayerPrefs.GetString($"Item_{i}_name", ""),
-                price = PlayerPrefs.GetInt($"Item_{i}_price", 0),
-                currentStack = PlayerPrefs.GetInt($"Item_{i}_stack", 1),
-                maxStack = PlayerPrefs.GetInt($"Item_{i}_maxStack", 99),
-                isStackable = PlayerPrefs.GetInt($"Item_{i}_stackable", 1) == 1
-            };
-            purchasedItems.Add(item);
-        }
-        Debug.Log("Loaded purchased items: " + itemCount);
-    }
+    
 
 private void SpawnItemsInPanel()
     {
@@ -259,7 +223,7 @@ private void SpawnItemsInPanel()
                 nameItem = ShopItems[index].title,
                 price = ShopItems[index].price,
                 currentStack = 1,
-                maxStack = 99,
+                maxStack = 3,
                 isStackable = true
             };
 
@@ -281,8 +245,5 @@ private void SpawnItemsInPanel()
         }
     }
 
-    public void NextMissionButton()
-    {
-        SceneManager.LoadScene("GamePlay");
-    }
+    
 }

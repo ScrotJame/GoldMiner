@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BomItem : ItemData
 {
-    public string nameItem = "Boom";
+    public string nameItem = "Dynamite";
    public string descriptionItem = "Destroy Object";
     public int id = 2;
     public int price = 1000;

@@ -8,4 +8,5 @@ public class Store : MonoBehaviour
     public Text titletext;
     public Text desciciptiontext;
     public Text pricetext;
+
 }

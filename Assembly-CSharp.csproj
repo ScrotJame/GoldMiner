@@ -84,6 +84,7 @@
     <Compile Include="Assets\Scripts\BackgroundScale.cs" />
     <Compile Include="Assets\Scripts\Screen\LoadScene.cs" />
     <Compile Include="Assets\Scripts\Item\DrugItem.cs" />
+    <Compile Include="Assets\InputButton.cs" />
     <Compile Include="Assets\Scripts\ShopControll\StoreManger.cs" />
   </ItemGroup>
   <ItemGroup>

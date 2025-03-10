@@ -1,23 +1,32 @@
+﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class LoadScene : MonoBehaviour
 {
-    public static LoadScene instance;
+    public Text targetScoreText; // UI hiển thị target score
+    private int targetScore;
 
-    private void Awake()
+    void Start()
     {
-        if (instance == null)
+        if (ScoreControl.instance != null)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }else
-        {
-            Destroy(gameObject);
+            targetScore = ScoreControl.instance.GetTargetScore();
+            targetScoreText.text = " " + targetScore;
         }
+        else
+        {
+            targetScoreText.text = "Target Score: Unknown";
+            Debug.LogError("ScoreControl instance is null!");
+        }
+
+        StartCoroutine(LoadGamePlayAfterDelay(5f)); // Chuyển sang GamePlay sau 5 giây
     }
-    public void LoadGameplayScene()
+
+    IEnumerator LoadGamePlayAfterDelay(float delay)
     {
-        SceneManager.LoadScene("GameplayScene");
+        yield return new WaitForSeconds(delay);
+        SceneManager.LoadScene("GamePlay");
     }
 }
