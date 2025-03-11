@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class LoadScene : MonoBehaviour
 {
-    public Text targetScoreText; // UI hiển thị target score
+    public Text targetScoreText;
     private int targetScore;
 
     void Start()

@@ -1,18 +1,12 @@
 using UnityEngine;
 
-public class ItemData
+public abstract class ItemData : MonoBehaviour
 {
-    public string nameItem;
-    public string descriptionItem;
-    public int id;
-    public int price;
-    public Sprite sprite;
-    public bool isStackable;
-    public int maxStack;
-    public int currentStack;
-    public bool isEquipped;
-    public void Buy()
-    {
-        Debug.Log("Buy " + nameItem);
-    }
+    [SerializeField] protected string itemName;        
+    [SerializeField] protected int cost;           
+    protected bool isAvailable = false;               
+    public abstract void UseItem(Pod pod);
+
+    public int GetCost() => cost;
+    public bool IsAvailable() => isAvailable;
 }

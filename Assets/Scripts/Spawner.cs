@@ -1,22 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class Spawner : MonoBehaviour
 {
     public static Spawner instance;
-    [SerializeField] private GameObject[] objectsToSpawn;
-    [SerializeField] private int maxAttempts = 100;
-    private float minSpawnDistance = 1.5f;
-    [SerializeField] private int minObjects = 3, maxObjects = 7;
-    private HashSet<Vector2> usedPositions = new HashSet<Vector2>();
 
-    [SerializeField] private Vector2 spawnAreaMin = new Vector2(-6.8f, -4.5f);
-    [SerializeField] private Vector2 spawnAreaMax = new Vector2(6.8f, 0.17f);
-
-    void Start()
+    // Struct định nghĩa thông tin spawn cho từng prefab
+    [System.Serializable]
+    public class SpawnableObject
     {
-        SpawnObjects();
+        public GameObject prefab;           
+        public int minCount;               
+        public int maxCount;
+        [Range(0f, 1f)]                    
+        public float spawnChance;
+        [HideInInspector]
+        public string objectType => prefab != null ? prefab.name : "Unknown";
     }
+    private bool isLuckActive = false;
+    private float diamondLuckBoost = 0.5f;
+
+    [SerializeField] private SpawnableObject[] spawnableObjects; 
+    [SerializeField] private int maxAttempts = 1000000000;          
+    [SerializeField] private float minSpawnDistance = 1.5f;    
+    [SerializeField] private Vector2 spawnAreaMin = new Vector2(-6.8f, -4.5f); 
+    [SerializeField] private Vector2 spawnAreaMax = new Vector2(6.8f, 0.17f);  
+
+    private HashSet<Vector2> usedPositions = new HashSet<Vector2>(); 
     private void Awake()
     {
         if (instance == null)
@@ -30,24 +41,48 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        SpawnObjects();
+    }
+
     private void SpawnObjects()
     {
-        foreach (var objectToSpawn in objectsToSpawn)
+        usedPositions.Clear(); // Xóa danh sách vị trí trước khi spawn
+        int currentLevel = GameManager.instance != null ? GameManager.instance.currentLevel: 1  ;
+        foreach (var spawnable in spawnableObjects)
         {
-            int itemsToSpawn = Random.Range(minObjects, maxObjects);
+            if (spawnable.prefab == null)
+            {
+                Debug.LogWarning($"Prefab is null for spawnable object type: {spawnable.objectType}");
+                continue;
+            }
+
+            int itemsToSpawn = Random.Range(spawnable.minCount, spawnable.maxCount + 1);
+
             for (int i = 0; i < itemsToSpawn; i++)
             {
-                Vector2 spawnPoint = GetValidSpawnPoint();
+                float chance = Random.value;
+                float adjustedChance = spawnable.spawnChance * (currentLevel / 10f);
+                if (isLuckActive && spawnable.objectType == "Diamond")
+                {
+                    adjustedChance = Mathf.Min(1f, spawnable.spawnChance + diamondLuckBoost);
+                }
+                if (chance <= adjustedChance ) ;
+                    Vector2 spawnPoint = GetValidSpawnPoint();
                 if (spawnPoint != Vector2.zero)
                 {
-                    Instantiate(objectToSpawn, spawnPoint, Quaternion.identity);
+                    GameObject spawnedObject = Instantiate(spawnable.prefab, spawnPoint, Quaternion.identity);
+                    spawnedObject.name = spawnable.prefab.name; 
                     usedPositions.Add(spawnPoint);
                 }
                 else
                 {
-                    Debug.LogWarning($"Failed to find spawn point for {objectToSpawn.name}");
+                    Debug.LogWarning($"Failed to find spawn point for {spawnable.objectType}");
+                    break;
                 }
             }
+            Debug.Log($"Spawned {itemsToSpawn} {spawnable.objectType}");
         }
     }
 
@@ -63,7 +98,7 @@ public class Spawner : MonoBehaviour
             if (!IsPositionOccupied(randomPoint))
                 return randomPoint;
         }
-        Debug.LogWarning("Could not find a valid spawn point.");
+        Debug.LogWarning("Could not find a valid spawn point after max attempts.");
         return Vector2.zero;
     }
 
@@ -81,21 +116,26 @@ public class Spawner : MonoBehaviour
 
     public void ResetLevel()
     {
+        // Xóa các đối tượng đã spawn
         foreach (var obj in GameObject.FindObjectsOfType<GameObject>())
         {
             string objName = obj.name.Replace("(Clone)", "").Trim();
-
-            // Kiểm tra nếu objName tồn tại trong objectsToSpawn
-            if (System.Array.Exists(objectsToSpawn, element => element.name == objName))
+            if (System.Array.Exists(spawnableObjects, element => element.prefab != null && element.prefab.name == objName))
             {
                 Destroy(obj);
             }
         }
-
+        isLuckActive = false;
         usedPositions.Clear();
         SpawnObjects();
 
         Debug.Log("New level has been created!");
     }
-
+    public IEnumerator ApplyLuckBoost(float duration)
+    {
+        isLuckActive = true;
+        yield return new WaitForSeconds(duration);
+        isLuckActive = false;
+        Debug.Log("Luck boost ended.");
+    }
 }

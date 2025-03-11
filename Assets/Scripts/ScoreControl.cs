@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ScoreControl : MonoBehaviour
 {
     public static ScoreControl instance;
-    public Text Score,  ScoreTarget; 
-    private int currentScore, targetScore;
+
+    [SerializeField] private Text Score;
+    [SerializeField] private Text ScoreTarget;
+
+    private int currentScore;
+    private int targetScore;
 
     private void Awake()
     {
@@ -13,91 +18,69 @@ public class ScoreControl : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            Debug.Log("ScoreControl instance initialized.");
+            LoadPlayerData(); 
         }
-        else if (instance != this)
+        else
         {
-            Debug.Log("Duplicate ScoreControl found, destroying: " + gameObject.name);
             Destroy(gameObject);
             return;
         }
-        if (Score == null)
-        {
-            GameObject scoreObj = GameObject.Find("ScoreText");
-            if (scoreObj != null)
-            {
-                Score = scoreObj.GetComponent<Text>();
-                Debug.Log("ScoreText assigned.");
-            }
-            else
-            {
-                Debug.LogError("ScoreText not found in scene!");
-            }
-        }
+    }
 
-        if (ScoreTarget == null)
-        {
-            GameObject scoreTargetObj = GameObject.Find("ScoreTargetText");
-            if (scoreTargetObj != null)
-            {
-                ScoreTarget = scoreTargetObj.GetComponent<Text>();
-                Debug.Log("ScoreTargetText assigned.");
-            }
-            else
-            {
-                Debug.LogError("ScoreTargetText not found in scene!");
-            }
-        }
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => AssignUIReferences();
+
+    private void AssignUIReferences()
+    {
+        Score = GameObject.Find("Score")?.GetComponent<Text>();
+        ScoreTarget = GameObject.Find("target")?.GetComponent<Text>();
+
+        if (Score == null) Debug.LogError("Score UI not found in scene!");
+        if (ScoreTarget == null) Debug.LogError("ScoreTarget UI not found in scene!");
+
+        UpdateScoreUI();
+        UpdateTargetScoreUI();
     }
 
     public void InitializeScore(int initialScore = 0, int target = 1000)
     {
         currentScore = initialScore;
         targetScore = target;
-        UpdateScoreUI();
-        UpdateTargetScoreUI();
+        AssignUIReferences(); // Đảm bảo UI luôn được cập nhật khi khởi tạo
     }
 
     public void AddScore(int amount)
     {
-        if (Score == null) return;
         currentScore += amount;
-        UpdateScoreUI();
         SavePlayerData();
+        UpdateScoreUI();
     }
 
     public bool SpendScore(int amount)
     {
-        if (Score == null) return false;
         if (currentScore >= amount)
         {
             currentScore -= amount;
-            UpdateScoreUI();
             SavePlayerData();
+            UpdateScoreUI();
             return true;
         }
         return false;
     }
 
-    public int GetCurrentScore()
-    {
-        return currentScore;
-    }
-
-    public int GetTargetScore()
-    {
-        return targetScore;
-    }
-
+    public int GetCurrentScore() => currentScore;
+    public int GetTargetScore() => targetScore;
     public void SetTargetScore(int target)
     {
         targetScore = target;
         UpdateTargetScoreUI();
     }
-    public void LoadPlayerData()
+
+    private void LoadPlayerData()
     {
         currentScore = PlayerPrefs.GetInt("PlayerScore", 0);
-        UpdateScoreUI();
     }
 
     private void SavePlayerData()
@@ -108,17 +91,11 @@ public class ScoreControl : MonoBehaviour
 
     private void UpdateScoreUI()
     {
-        if (Score != null)
-        {
-            Score.text = currentScore.ToString();
-        }
+        if (Score != null) Score.text = currentScore.ToString();
     }
 
     private void UpdateTargetScoreUI()
     {
-        if (ScoreTarget != null)
-        {
-            ScoreTarget.text = targetScore.ToString();
-        }
+        if (ScoreTarget != null) ScoreTarget.text = targetScore.ToString();
     }
 }

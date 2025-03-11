@@ -1,20 +1,28 @@
+﻿using Unity.VisualScripting;
 using UnityEngine;
 
 public class StrengItem : ItemData
 {
-    public StrengItem instance;
-    public string nameItem = "Streng";
-    public string descriptionItem = "Streng Item";
-    public int id = 3;
-    public int price = 100;
-    public bool isStackable;
-    public bool isUseable;
+    [SerializeField] private float weightReduction = 0.5f;
+    [SerializeField] private float duration = 10f;
 
-    private void Update()
+    private void Awake()
     {
+        itemName = "Strength";
+        cost = 120;
     }
-    public void Buy()
+
+    public override void UseItem(Pod pod)
     {
-        Debug.Log("Buy " + nameItem);
+        if (!isAvailable) return;
+
+        pod.StartCoroutine(ApplyStrengthBoost(pod));
+        isAvailable = false;
+        Debug.Log("Strength used! Weight reduced.");
+    }
+
+    private System.Collections.IEnumerator ApplyStrengthBoost(Pod pod)
+    {
+        yield return new WaitForSeconds(duration);
     }
 }

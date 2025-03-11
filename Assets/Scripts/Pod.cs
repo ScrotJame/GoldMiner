@@ -18,14 +18,36 @@ public class Pod : MonoBehaviour
     public Transform _transformPostion;
 
     [SerializeField] public float _scrollSpeed = 2.0f;
-    [SerializeField] public float _rotationSpeed = 2;
+    [SerializeField] public float _rotationSpeed = 1.25f;
     [SerializeField] public float _slow;
+
+    private Animator _animHook;
+    [SerializeField] private Transform minerTransform; 
 
     private void Start()
     {
         Time.timeScale = 1;
         _state = StateMoc._rotation;
-        _animMiner = transform.root.GetComponent<Animator>();
+
+        if (minerTransform != null)
+        {
+            _animMiner = minerTransform.GetComponent<Animator>();
+            Transform moc_0 = FindChildByName(minerTransform, "moc_0");
+            if (moc_0 != null)
+            {
+                Transform hook = FindChildByName(moc_0, "Hook");
+                if (hook != null)  _animHook = hook.GetComponent<Animator>();        
+            }
+            else
+            {
+                Debug.LogError("Không tìm thấy moc_0 trong miner!");
+            }
+        }
+        else
+        {
+            Debug.LogError("Miner Transform không được gán trong Inspector!");
+        }
+
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _audio = GetComponent<AudioSource>();
@@ -34,16 +56,24 @@ public class Pod : MonoBehaviour
         useBoomClip = Resources.Load<AudioClip>("Sound/useBoom");
         _mainCamera = Camera.main;
         _fistPosition = transform.position;
-
-        // Kiểm tra Animator
-        if (_anim == null)
+    }
+    Transform FindChildByName(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
         {
-            Debug.LogError("Animator component not found on Pod!");
+            if (child.name == name)
+                return child;
+
+            Transform found = FindChildByName(child, name);
+            if (found != null)
+                return found;
         }
+        return null;
     }
 
     public void Awake()
     {
+        
     }
 
     public enum StateMoc
@@ -101,7 +131,7 @@ public class Pod : MonoBehaviour
                         if (gold != null)
                         {
                             Destroy(_transformPostion.gameObject);
-                            if (_anim != null) _anim.SetBool("got", false);
+                            if (_animHook != null) _animHook.SetBool("got", false);
                             if (_animMiner != null) _animMiner.Play("MinerRewind");
 
                             int goldPoints = gold.RewindObject.point;
@@ -124,6 +154,7 @@ public class Pod : MonoBehaviour
                     if (_animMiner != null) _animMiner.Play("MinerBaseState");
                 }
                 break;
+
         }
     }
 
@@ -138,36 +169,39 @@ public class Pod : MonoBehaviour
 
             if (_flagCollect) return;
             _flagCollect = true;
+
             if (_animMiner != null) _animMiner.Play("MinerRoll");
-            GoldBase gold = collision.gameObject.GetComponent<GoldBase>();
-            if (gold != null)
-            {
-                if (gold.currentState == GoldBase.GoldState.Idle)
-                {
-                    gold.currentState = GoldBase.GoldState.BeingGrabbed;
-                    gold.currentState = GoldBase.GoldState.Collected;
-                }
-            }
 
             GoldBase _gold = collision.gameObject.GetComponent<GoldBase>();
+            Mouse mouse = collision.gameObject.GetComponent<Mouse>();
+
             if (_gold != null && _gold.RewindObject != null)
             {
                 _slow = _gold.RewindObject.weight;
                 Debug.Log($"Collected {collision.gameObject.tag}! Weight: {_gold.RewindObject.weight}, Points: {_gold.RewindObject.point}");
+            }
+            else if (mouse != null && mouse.RewindObject != null)
+            {
+                _slow = mouse.RewindObject.weight;
+                Debug.Log($"Collected {collision.gameObject.tag}! Weight: {mouse.RewindObject.weight}");
             }
             else
             {
                 Debug.LogWarning("DataObject not found on " + collision.gameObject.name);
             }
 
-            Animator goldAnim = collision.gameObject.GetComponent<Animator>();
-            if (goldAnim != null)
+            // Kích hoạt animation nếu có
+            Animator goldAnim = _gold?.GetComponent<Animator>();
+            Animator mouseAnim = mouse?.GetComponent<Animator>();
+            if (goldAnim != null || mouseAnim != null)
             {
-                if (_anim != null) _anim.SetBool("got", true);
-                goldAnim.SetBool("is_got", true);
+                if (_animHook != null) _animHook.SetBool("got", true);
+                goldAnim?.SetBool("is_got", true);
+                mouseAnim?.SetBool("is_got", true);
             }
         }
     }
+
 
     public void ResetHookPosition()
     {

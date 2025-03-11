@@ -1,28 +1,34 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LuckItem : ItemData
 {
-    public string nameItem = "Luck Item";
-    public string descriptionItem = "This item will increase your luck";
-    public int id = 1;
-    public int price = 100;
-    public bool isStackable = false;
-    public int maxStack = 1;
-    public bool isEquippable;
-    public bool isUsable = false;
+    [SerializeField] private float duration = 10f; // Thời gian hiệu ứng
 
-    private void Update()
+    private void Awake()
     {
-        
+        itemName = "Luck";
+        cost = 150;
     }
-    private void Start()
+
+    public override void UseItem(Pod pod)
     {
-        sprite = Resources.Load<Sprite>("Sprites/LuckItem");
+        if (!isAvailable) return;
+
+        Debug.Log("Luck activated! Higher chance for valuable items.");
+        isAvailable = false;
+        if (Spawner.instance != null)
+        {
+            Spawner.instance.StartCoroutine(Spawner.instance.ApplyLuckBoost(duration));
+        }
+        else
+        {
+            Debug.LogError("Spawner instance not found!");
+        }
+        Invoke(nameof(ResetCooldown), duration);
     }
-    public void Buy()
+
+    protected virtual void ResetCooldown()
     {
-        Debug.Log("Using " + nameItem);
-        isEquippable = true;
-        //Destroy(gameObject);
+        isAvailable = true;
     }
 }

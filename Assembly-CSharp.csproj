@@ -71,9 +71,10 @@
     <Compile Include="Assets\Scripts\TNT_s.cs" />
     <Compile Include="Assets\Scripts\ScoreControl.cs" />
     <Compile Include="Assets\Scripts\Configuration\DataObject.cs" />
+    <Compile Include="Assets\Scripts\ObjectCollection\Mouse.cs" />
     <Compile Include="Assets\Scripts\Screen\LoadingScreen.cs" />
     <Compile Include="Assets\Scripts\ObjectCollection\BoomItem.cs" />
-    <Compile Include="Assets\Scripts\Item\BomItem.cs" />
+    <Compile Include="Assets\Scripts\Item\DynamiteItem.cs" />
     <Compile Include="Assets\Scripts\Pod.cs" />
     <Compile Include="Assets\Scripts\Configuration\ShopItem.cs" />
     <Compile Include="Assets\Scripts\Item\LuckItem.cs" />
