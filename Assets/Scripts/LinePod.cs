@@ -2,13 +2,17 @@
 
 public class LinePod : MonoBehaviour
 {
+    public static LinePod instance;
     public Transform hook;
     public Transform originPoint;
     private LineRenderer lineRenderer;
-    private Transform targetGold = null; 
+    private Transform targetGold = null;
+    private Animator _anim;
+    public GameObject dynamiteButton; 
 
     void Start()
     {
+        instance = this; 
         lineRenderer = GetComponent<LineRenderer>();
         if (lineRenderer == null)
         {
@@ -27,6 +31,7 @@ public class LinePod : MonoBehaviour
 
         lineRenderer.sortingLayerName = "Default";
         lineRenderer.sortingOrder = 5;
+        _anim = hook.GetComponent<Animator>();
     }
 
     void Update()
@@ -37,7 +42,7 @@ public class LinePod : MonoBehaviour
 
             if (targetGold == null)
             {
-                lineRenderer.SetPosition(1, hook.position); 
+                lineRenderer.SetPosition(1, hook.position);
             }
             else
             {
@@ -46,19 +51,14 @@ public class LinePod : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Gold"))
-        {
-            Debug.Log("Hooked Gold!");
-
-            targetGold = collision.transform;
-        }
-    }
-
     public void ResetHook()
     {
         Debug.Log("Gold destroyed, resetting hook!");
-        targetGold = null;
+        if (_anim != null)
+        {
+            _anim.SetBool("got", false); // Reset animation
+        }
     }
+
+    
 }

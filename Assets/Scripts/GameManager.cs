@@ -11,11 +11,14 @@ public class GameManager : MonoBehaviour
     public int currentLevel = 1;
     public int goldAmount = 0;
 
-    private int initialTime = 60;
+    private int initialTime = 20;
     private int timeLeft;
     private Coroutine countdownCoroutine;
+    private Coroutine missionPanelCoroutine; // Quản lý coroutine cho _MissionPanel
     [SerializeField]
-    private GameObject _MenuGamePanel, _GameNotifPanel, _MissionPanel;
+    private GameObject _MenuGamePanel, _GameNotifPanel, _MissionPanel; // Gán qua Inspector
+    [SerializeField]
+    private GameObject missionPanelPrefab; // Prefab để khởi tạo nếu cần
     private Text _MissionTargetText;
 
     private ScoreControl scoreManager;
@@ -23,6 +26,7 @@ public class GameManager : MonoBehaviour
     private Pod pod;
     private int _basetime;
     private int _nextScore;
+    public LinePod linePod;
 
     private void Awake()
     {
@@ -30,7 +34,9 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            DontDestroyOnLoad(_MissionPanel);
+            // Chỉ giữ _MissionPanel nếu đã gán trong Inspector
+            if (_MissionPanel != null)
+                DontDestroyOnLoad(_MissionPanel);
         }
         else
         {
@@ -43,21 +49,47 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeLevel();
-        StartCountdown();
-        ActivePanel();
+        // Không gọi InitializeLevel ở đây, sẽ gọi trong OnSceneLoaded
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // Dừng các coroutine khi scene thay đổi
+        if (countdownCoroutine != null)
+        {
+            StopCoroutine(countdownCoroutine);
+            countdownCoroutine = null;
+        }
+        if (missionPanelCoroutine != null)
+        {
+            StopCoroutine(missionPanelCoroutine);
+            missionPanelCoroutine = null;
+        }
+
         if (scene.name == "GamePlay")
         {
+            // Tìm lại các tham chiếu trong scene
             _Time = GameObject.Find("Time")?.GetComponent<Text>();
             Number = GameObject.Find("SL")?.GetComponent<Text>();
             _Notif = GameObject.Find("NotiText")?.GetComponent<Text>();
             _MissionTargetText = GameObject.Find("MissiontargetText")?.GetComponent<Text>();
 
-            _MissionPanel = GameObject.Find("NotifMission");
+            // Khởi tạo _MissionPanel
+            if (_MissionPanel == null)
+            {
+                if (missionPanelPrefab != null)
+                {
+                    _MissionPanel = Instantiate(missionPanelPrefab);
+                    DontDestroyOnLoad(_MissionPanel); // Giữ instance mới
+                }
+                else
+                {
+                    _MissionPanel = GameObject.Find("NotifMission");
+                    if (_MissionPanel != null && !ReferenceEquals(_MissionPanel, _MissionPanel))
+                        DontDestroyOnLoad(_MissionPanel);
+                }
+            }
+
             _GameNotifPanel = GameObject.Find("Notifice");
             _MenuGamePanel = GameObject.Find("MenuPause");
 
@@ -66,18 +98,42 @@ public class GameManager : MonoBehaviour
             pod = FindObjectOfType<Pod>();
 
             if (scoreManager == null) Debug.LogError("ScoreControl not found in scene!");
+            if (_MissionPanel == null) Debug.LogError("MissionPanel not found in scene!");
+
+            // Kích hoạt _MissionPanel ngay khi scene "GamePlay" được tải
+            if (_MissionPanel != null)
+            {
+                _MissionPanel.SetActive(true);
+                if (_MissionTargetText != null)
+                {
+                    _MissionTargetText.text = scoreManager?.GetTargetScore().ToString() ?? "0";
+                }
+                missionPanelCoroutine = StartCoroutine(HideMissionPanelAfterDelay(3f)); // Ẩn sau 3 giây
+            }
+            else
+            {
+                Debug.LogError("MissionPanel could not be initialized in GamePlay scene!");
+            }
+
+            // Đảm bảo các panel khác không hiển thị
+            if (_GameNotifPanel != null && _GameNotifPanel.activeSelf)
+                _GameNotifPanel.SetActive(false);
+            if (_MenuGamePanel != null && _MenuGamePanel.activeSelf)
+                _MenuGamePanel.SetActive(false);
+
+            // Khởi tạo level sau khi MissionPanel được hiển thị
+            InitializeLevel();
         }
     }
 
     private void InitializeLevel()
     {
-        _MissionPanel.SetActive(true);
         timeLeft = initialTime;
         _SetTime(timeLeft);
         if (scoreManager != null && currentLevel == 1)
             scoreManager.InitializeScore(0, 10);
         _SetNumber();
-        StartCoroutine(HideMissionPanelAfterDelay(3f)); 
+        StartCountdown();
     }
 
     private void StartCountdown()
@@ -106,7 +162,7 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0;
         _basetime = timeLeft;
-        currentLevel ++;
+        currentLevel++;
         _basetime += 15;
         if (score > 10000)
         {
@@ -123,7 +179,7 @@ public class GameManager : MonoBehaviour
             {
                 _MissionTargetText.text = $" {_nextScore}";
             }
-            StartCoroutine(HideMissionPanelAndContinue(3f));
+            missionPanelCoroutine = StartCoroutine(HideMissionPanelAndContinue(3f));
         }
         else
         {
@@ -133,25 +189,37 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator HideMissionPanelAndContinue(float delay)
     {
-        yield return new WaitForSecondsRealtime(delay); 
-        _MissionPanel?.SetActive(false);
+        yield return new WaitForSecondsRealtime(delay);
+        if (_MissionPanel != null)
+        {
+            _MissionPanel.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("MissionPanel is null or has been destroyed in HideMissionPanelAndContinue!");
+        }
         ResetGameForNewLevel();
     }
 
     private void CheckMissionComplete(int score, int time)
     {
-        if (time <= 0 && score >= (scoreManager?.GetTargetScore() ?? 0))
+        if (time <= 0)
         {
-            _Notif.text = "Mission Complete!";
-            NextMission(score); 
-        }
-        else if (time <= 0)
-        {
-            _Notif.text = "Mission Failed! \n Do you want to try again?";
-            scoreManager?.InitializeScore(0);
-            Time.timeScale = 0;
+            pod?.ResetHookPosition();
 
-            if (_GameNotifPanel != null) _GameNotifPanel.SetActive(true);
+            if (score >= (scoreManager?.GetTargetScore() ?? 0))
+            {
+                _Notif.text = "Mission Complete!";
+                SceneManager.LoadScene("Store");
+                NextMission(score);
+            }
+            else
+            {
+                _Notif.text = "Mission Failed! \n Do you want to try again?";
+                scoreManager?.InitializeScore(0);
+                Time.timeScale = 0;
+                _GameNotifPanel?.SetActive(true);
+            }
         }
     }
 
@@ -169,7 +237,8 @@ public class GameManager : MonoBehaviour
         ActivePanel();
         spawner?.ResetLevel();
         initialTime += 15;
-        _SetTime(initialTime); if (scoreManager != null)
+        _SetTime(initialTime);
+        if (scoreManager != null)
             scoreManager.InitializeScore(scoreManager.GetCurrentScore(), _nextScore);
         _SetNumber();
         Time.timeScale = 1;
@@ -188,14 +257,24 @@ public class GameManager : MonoBehaviour
 
     private void ActivePanel()
     {
-        _MenuGamePanel?.SetActive(false);
-        _GameNotifPanel?.SetActive(false);
-        _MissionPanel?.SetActive(false);
+        if (_MenuGamePanel != null && _MenuGamePanel.activeSelf)
+            _MenuGamePanel.SetActive(false);
+        if (_GameNotifPanel != null && _GameNotifPanel.activeSelf)
+            _GameNotifPanel.SetActive(false);
+        if (_MissionPanel != null && _MissionPanel.activeSelf)
+            _MissionPanel.SetActive(false);
     }
 
     private IEnumerator HideMissionPanelAfterDelay(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
-        _MissionPanel?.SetActive(false);
+        if (_MissionPanel != null)
+        {
+            _MissionPanel.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("MissionPanel is null or has been destroyed in HideMissionPanelAfterDelay!");
+        }
     }
 }

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8046c3bef8e1f374498d4c386365e78d, type: 3}
   m_Name: mouse_dia
   m_EditorClassIdentifier: 
-  objectName: 
+  objectName: mouse_kc
   weight: 2.1
   point: 540

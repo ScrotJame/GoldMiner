@@ -5,6 +5,8 @@ public class GoldBase : MonoBehaviour
     public DataObject RewindObject;
     public static GoldBase instanceGold;
     public GoldState currentState = GoldState.Idle;
+    public int health = 1;
+    public GameObject destroyEffect;
     public enum GoldState { Idle, BeingGrabbed, Collected }
 
     private Rigidbody2D rb2D;
@@ -44,5 +46,32 @@ public class GoldBase : MonoBehaviour
         {
             linePod.ResetHook();
         }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log($"Triggered with: {collision.gameObject.name}");
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log($"Collided with: {collision.gameObject.name}");
+    }
+    public void TakeDamage()
+    {
+        health--;
+
+        if (health <= 0)
+        {
+            DestroyObject();
+        }
+    }
+    void DestroyObject()
+    {
+        if (destroyEffect != null)
+        {
+            Instantiate(destroyEffect, transform.position, Quaternion.identity);
+        }
+
+        Destroy(gameObject);
     }
 }

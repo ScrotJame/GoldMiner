@@ -1,37 +1,61 @@
-using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class DynamiteItem : ItemData
+public class DynamiteItem : MonoBehaviour
 {
-    
-    [SerializeField] private GameObject explosionPrefab;
-    [SerializeField] private float explosionRadius = 2f;
+    public float speed = 5f;
+    private Vector3 direction;
+    private Transform targetItem;
+    private AudioClip explosionClip;
+    private AudioSource audioSource;
+    private Pod pod; 
 
-    private void Awake()
+    public void Initialize(Vector3 startPos, Vector3 targetPos, Transform itemToDestroy, Pod podScript)
     {
-        itemName = "Dynamite";
-        cost = 100;   
+        transform.position = startPos;
+        direction = (targetPos - startPos).normalized;
+        targetItem = itemToDestroy;
+        pod = podScript;
+        audioSource = GetComponent<AudioSource>();
+        explosionClip = Resources.Load<AudioClip>("Sound/useBoom");
+
+        if (targetItem == null || pod == null)
+        {
+            Debug.LogWarning("Target item or Pod is null in DynamiteItem.Initialize! Destroying Dynamite.");
+            Destroy(gameObject);
+        }
     }
 
-    public override void UseItem(Pod pod)
+    void Update()
     {
-        if (!isAvailable) return;
-
-        Vector3 spawnPosition = pod.transform.position + Vector3.down * 2f;
-        GameObject explosion = Instantiate(explosionPrefab, spawnPosition, Quaternion.identity);
-
-        Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(spawnPosition, explosionRadius);
-        foreach (var obj in nearbyObjects)
+        if (targetItem == null || pod == null)
         {
-            if (obj.CompareTag("Item"))
-            {
-                Destroy(obj.gameObject);
-            }
+            Debug.Log("Target item or Pod lost! Destroying Dynamite.");
+            Destroy(gameObject);
+            return;
         }
 
-        Destroy(explosion, 1f);
-        isAvailable = false;
-        Debug.Log("Dynamite used!");
+        transform.Translate(direction * speed * Time.deltaTime, Space.World);
+
+        if (Vector3.Distance(transform.position, targetItem.position) > 10f)
+        {
+            Debug.Log("Dynamite exceeded max distance. Destroying.");
+            pod.OnDynamiteFinished(false); // khong pha vat pham khi di
+            Destroy(gameObject);
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (targetItem != null && collision.transform == targetItem)
+        {
+            Debug.Log("Dynamite hit item: " + collision.gameObject.name);
+            Destroy(collision.gameObject);
+            if (audioSource != null && explosionClip != null)
+            {
+                audioSource.PlayOneShot(explosionClip);
+            }
+            pod.OnDynamiteFinished(true); // pa huy vat pham
+            Destroy(gameObject);
+        }
     }
 }
-

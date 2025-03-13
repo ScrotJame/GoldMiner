@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Gold
   - TNT
+  - Hook
   layers:
   - Default
   - TransparentFX

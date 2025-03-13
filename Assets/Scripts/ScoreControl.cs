@@ -30,15 +30,18 @@ public class ScoreControl : MonoBehaviour
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => AssignUIReferences();
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) { AssignUIReferences(); UpdateTargetScoreUI(); }
 
     private void AssignUIReferences()
     {
         Score = GameObject.Find("Score")?.GetComponent<Text>();
-        ScoreTarget = GameObject.Find("target")?.GetComponent<Text>();
-
+        //ScoreTarget = GameObject.Find("target")?.GetComponent<Text>();
+        if (SceneManager.GetActiveScene().name == "GamePlay")
+        {
+            UpdateScoreUI();
+            UpdateTargetScoreUI();
+        }
         if (Score == null) Debug.LogError("Score UI not found in scene!");
-        if (ScoreTarget == null) Debug.LogError("ScoreTarget UI not found in scene!");
 
         UpdateScoreUI();
         UpdateTargetScoreUI();
@@ -86,6 +89,7 @@ public class ScoreControl : MonoBehaviour
     private void SavePlayerData()
     {
         PlayerPrefs.SetInt("PlayerScore", currentScore);
+        PlayerPrefs.SetInt("TargetScore", targetScore);
         PlayerPrefs.Save();
     }
 

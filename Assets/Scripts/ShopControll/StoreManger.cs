@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class StoreManager : MonoBehaviour
@@ -159,13 +160,43 @@ public class StoreManager : MonoBehaviour
                 Button button = item.GetComponent<Button>();
                 if (button != null)
                 {
-                    Text priceText = item.GetComponentsInChildren<Text>()[1];
-                    int price = int.Parse(priceText.text);
-                    button.interactable = (gameManager.goldAmount >= price);
+                    Text[] texts = item.GetComponentsInChildren<Text>();
+                    if (texts.Length < 2)
+                    {
+                        Debug.LogError("Không tìm thấy Text UI chứa giá!");
+                        continue;
+                    }
+
+                    string priceTextStr = texts[1].text.Trim();
+                    Debug.Log($"Kiểm tra giá trị text: '{priceTextStr}'"); 
+                    if (string.IsNullOrEmpty(priceTextStr))
+                    {
+                        Debug.LogError("Chuỗi giá rỗng hoặc không hợp lệ!");
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(priceTextStr))
+                    {
+                        Debug.LogError("Chuỗi giá rỗng hoặc không hợp lệ!");
+                        continue;
+                    }
+
+                    priceTextStr = priceTextStr.Replace(",", "").Replace("$", "");
+
+                    if (int.TryParse(priceTextStr, out int price))
+                    {
+                        button.interactable = (ScoreControl.instance.GetCurrentScore() >= price);
+                    }
+                    else
+                    {
+                        Debug.LogError($"⚠ Không thể chuyển đổi giá '{priceTextStr}' thành số nguyên!");
+                    }
                 }
             }
         }
     }
+
+
 
     public void BuyItem(int index)
     {
@@ -175,16 +206,15 @@ public class StoreManager : MonoBehaviour
             return;
         }
 
-        if (gameManager.goldAmount >= ShopItems[index].price)
+        int price = ShopItems[index].price;
+
+        if (ScoreControl.instance.SpendScore(price))
         {
-            gameManager.goldAmount -= ShopItems[index].price;
-            UpdateMoneyUI();
-
-            
-
             Debug.Log("Bought item: " + ShopItems[index].title);
 
-            GameObject itemToRemove = spawnedItems.Find(item => item != null && item.GetComponentsInChildren<Text>()[0].text == ShopItems[index].title);
+            GameObject itemToRemove = spawnedItems.Find(item => item != null &&
+                item.GetComponentsInChildren<Text>()[0].text == ShopItems[index].title);
+
             if (itemToRemove != null)
             {
                 spawnedItems.Remove(itemToRemove);
@@ -195,7 +225,12 @@ public class StoreManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Not enough money to buy item: " + ShopItems[index].title);
+            Debug.Log("Not enough score to buy item: " + ShopItems[index].title);
         }
+    }
+
+    public void _StartGameButton()
+    {
+        SceneManager.LoadScene("GamePlay");
     }
 }

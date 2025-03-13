@@ -5,8 +5,6 @@ using System.Collections;
 public class Spawner : MonoBehaviour
 {
     public static Spawner instance;
-
-    // Struct định nghĩa thông tin spawn cho từng prefab
     [System.Serializable]
     public class SpawnableObject
     {
@@ -48,16 +46,10 @@ public class Spawner : MonoBehaviour
 
     private void SpawnObjects()
     {
-        usedPositions.Clear(); // Xóa danh sách vị trí trước khi spawn
+        usedPositions.Clear(); 
         int currentLevel = GameManager.instance != null ? GameManager.instance.currentLevel: 1  ;
         foreach (var spawnable in spawnableObjects)
         {
-            if (spawnable.prefab == null)
-            {
-                Debug.LogWarning($"Prefab is null for spawnable object type: {spawnable.objectType}");
-                continue;
-            }
-
             int itemsToSpawn = Random.Range(spawnable.minCount, spawnable.maxCount + 1);
 
             for (int i = 0; i < itemsToSpawn; i++)
