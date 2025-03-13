@@ -240,9 +240,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Price
-
-'
+  m_Text: 0
 --- !u!1 &8432596228640585326
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,13 +365,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: c647e5cd5e0d9774f8ee6c2371c59a18, type: 3}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: StoreManager, Assembly-CSharp
+        m_MethodName: BuyItem
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -394,4 +392,3 @@ MonoBehaviour:
   titletext: {fileID: 7514116867748178750}
   desciciptiontext: {fileID: 7972956349540974281}
   pricetext: {fileID: 4838177073669557863}
-  image: {fileID: 0}

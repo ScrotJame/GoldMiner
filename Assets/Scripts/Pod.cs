@@ -279,4 +279,15 @@ public class Pod : MonoBehaviour
             Debug.Log("Dynamite did not destroy item.");
         }
     }
+    private void CheckMissionComplete()
+    {
+        if (ScoreControl.instance != null && ScoreControl.instance.GetCurrentScore() >= ScoreControl.instance.GetTargetScore())
+        {
+            Debug.Log("Mission completed!");
+            if (GameManager.instance != null)
+            {
+                GameManager.instance.NextMission(ScoreControl.instance.GetCurrentScore());
+            }
+        }
+    }
 }

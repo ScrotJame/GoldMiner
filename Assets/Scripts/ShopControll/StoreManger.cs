@@ -147,7 +147,7 @@ public class StoreManager : MonoBehaviour
     {
         if (MoneyUI != null)
         {
-            MoneyUI.text = gameManager.goldAmount.ToString();
+            MoneyUI.text = ScoreControl.instance.GetCurrentScore().ToString();
         }
     }
 
@@ -200,37 +200,36 @@ public class StoreManager : MonoBehaviour
 
     public void BuyItem(int index)
     {
-        if (index < 0 || index >= ShopItems.Length)
-        {
-            Debug.LogError("Invalid item index: " + index);
-            return;
-        }
+        if (index < 0 || index >= ShopItems.Length) return;
 
         int price = ShopItems[index].price;
-
         if (ScoreControl.instance.SpendScore(price))
         {
             Debug.Log("Bought item: " + ShopItems[index].title);
-
             GameObject itemToRemove = spawnedItems.Find(item => item != null &&
                 item.GetComponentsInChildren<Text>()[0].text == ShopItems[index].title);
-
             if (itemToRemove != null)
             {
                 spawnedItems.Remove(itemToRemove);
                 Destroy(itemToRemove);
             }
-
             CheckPurchasable();
-        }
-        else
-        {
-            Debug.Log("Not enough score to buy item: " + ShopItems[index].title);
+            UpdateMoneyUI(); // Cập nhật UI sau khi mua
         }
     }
 
     public void _StartGameButton()
     {
+        if (gameManager != null)
+        {
+            int currentScore = ScoreControl.instance?.GetCurrentScore() ?? 0;
+            gameManager.NextMission(currentScore); 
+            Debug.Log($"Switching to Gameplay. Current Score: {currentScore}, New Target: {gameManager._nextScore}");
+        }
+        else
+        {
+            Debug.LogError("GameManager instance not found!");
+        }
         SceneManager.LoadScene("GamePlay");
     }
 }

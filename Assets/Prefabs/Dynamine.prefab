@@ -240,7 +240,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Price
+  m_Text: '0
 
 '
 --- !u!1 &8432596228640585326
@@ -408,24 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a4e7b9284c44d4ea4b866c18fa5f40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nameItem: 
-  descriptionItem: 
-  id: 0
-  price: 0
-  sprite: {fileID: 0}
-  isStackable: 0
-  maxStack: 0
-  currentStack: 0
-  isEquipped: 0
-  isUsable: 0
-  nameItem: Boom
-  descriptionItem: Destroy Object
-  id: 2
-  price: 1000
-  isStackable: 1
-  maxStack: 3
-  isEquippable: 0
-  isUsable: 0
+  speed: 5
 --- !u!61 &-1616556326970305026
 BoxCollider2D:
   m_ObjectHideFlags: 0

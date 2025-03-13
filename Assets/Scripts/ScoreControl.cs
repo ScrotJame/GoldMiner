@@ -1,16 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class ScoreControl : MonoBehaviour
 {
     public static ScoreControl instance;
-
-    [SerializeField] private Text Score;
-    [SerializeField] private Text ScoreTarget;
-
-    private int currentScore;
-    private int targetScore;
+    private int currentScore = 0;
+    private int targetScore = 1000;
+    private int highScore = 0;
 
     private void Awake()
     {
@@ -18,47 +14,24 @@ public class ScoreControl : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadPlayerData(); 
+            LoadData();
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) { AssignUIReferences(); UpdateTargetScoreUI(); }
-
-    private void AssignUIReferences()
-    {
-        Score = GameObject.Find("Score")?.GetComponent<Text>();
-        //ScoreTarget = GameObject.Find("target")?.GetComponent<Text>();
-        if (SceneManager.GetActiveScene().name == "GamePlay")
-        {
-            UpdateScoreUI();
-            UpdateTargetScoreUI();
-        }
-        if (Score == null) Debug.LogError("Score UI not found in scene!");
-
-        UpdateScoreUI();
-        UpdateTargetScoreUI();
-    }
-
-    public void InitializeScore(int initialScore = 0, int target = 1000)
-    {
-        currentScore = initialScore;
-        targetScore = target;
-        AssignUIReferences(); // Đảm bảo UI luôn được cập nhật khi khởi tạo
-    }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => UpdateUI();
 
     public void AddScore(int amount)
     {
         currentScore += amount;
-        SavePlayerData();
-        UpdateScoreUI();
+        SaveData();
+        UpdateUI();
     }
 
     public bool SpendScore(int amount)
@@ -66,8 +39,8 @@ public class ScoreControl : MonoBehaviour
         if (currentScore >= amount)
         {
             currentScore -= amount;
-            SavePlayerData();
-            UpdateScoreUI();
+            SaveData();
+            UpdateUI();
             return true;
         }
         return false;
@@ -75,31 +48,67 @@ public class ScoreControl : MonoBehaviour
 
     public int GetCurrentScore() => currentScore;
     public int GetTargetScore() => targetScore;
-    public void SetTargetScore(int target)
+    public int GetHighScore() => highScore;
+
+    public void SetTargetScore(int newTarget)
     {
-        targetScore = target;
-        UpdateTargetScoreUI();
+        targetScore = newTarget;
+        SaveData();
+        UpdateUI();
     }
 
-    private void LoadPlayerData()
+    public void CheckAndSaveHighScore()
     {
-        currentScore = PlayerPrefs.GetInt("PlayerScore", 0);
+        if (currentScore > highScore)
+        {
+            highScore = currentScore;
+            SaveData();
+        }
     }
 
-    private void SavePlayerData()
+    public void StartNewGame()
     {
-        PlayerPrefs.SetInt("PlayerScore", currentScore);
+        CheckAndSaveHighScore();
+        ResetScore();
+        SaveData();
+        UpdateUI();
+    }
+
+    public void ResetScore()
+    {
+        currentScore = 0;
+        targetScore = 650;
+        SaveData();
+        UpdateUI();
+    }
+
+    public void InitializeScore(int newScore, int newTarget)
+    {
+        currentScore = newScore;
+        targetScore = newTarget;
+        SaveData();
+        UpdateUI();
+    }
+
+    private void LoadData()
+    {
+        currentScore = PlayerPrefs.GetInt("CurrentScore", 0);
+        targetScore = PlayerPrefs.GetInt("TargetScore", 1000);
+        highScore = PlayerPrefs.GetInt("HighScore", 0);
+    }
+
+    private void SaveData()
+    {
+        PlayerPrefs.SetInt("CurrentScore", currentScore);
         PlayerPrefs.SetInt("TargetScore", targetScore);
+        PlayerPrefs.SetInt("HighScore", highScore);
         PlayerPrefs.Save();
     }
 
-    private void UpdateScoreUI()
+    private void UpdateUI()
     {
-        if (Score != null) Score.text = currentScore.ToString();
-    }
-
-    private void UpdateTargetScoreUI()
-    {
-        if (ScoreTarget != null) ScoreTarget.text = targetScore.ToString();
+        UIManager.instance?.UpdateScoreUI(currentScore);
+        UIManager.instance?.UpdateTargetScoreUI(targetScore);
+        UIManager.instance?.UpdateHighScoreUI(highScore);
     }
 }
