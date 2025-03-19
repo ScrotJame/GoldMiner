@@ -18,8 +18,8 @@ public class GameManager : MonoBehaviour
 
     private Spawner spawner;
     private Pod pod;
-    public  int _nextScore;
-
+    public int _nextScore;
+        
     private void Awake()
     {
         if (instance == null)
@@ -42,8 +42,7 @@ public class GameManager : MonoBehaviour
     {
         if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
 
-        if (scene.name == "GamePlay")
-        {
+        
             UIManager.instance.HidePanels();
             spawner = FindObjectOfType<Spawner>();
             pod = FindObjectOfType<Pod>();
@@ -55,7 +54,7 @@ public class GameManager : MonoBehaviour
                 NextMission(pendingScore);
                 shouldStartNextMission = false;
             }
-        }
+        
     }
 
     private void InitializeLevel()
@@ -95,14 +94,14 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0;
         currentLevel++;
-
         int baseTime = timeLeft + 15;
         _nextScore = (score > 10000) ? score / 4 + (ScoreControl.instance?.GetTargetScore() ?? 0) : score / 2 + (ScoreControl.instance?.GetTargetScore() ?? 0);
 
         ScoreControl.instance?.SetTargetScore(_nextScore);
         UIManager.instance.ShowMissionPanel(_nextScore);
-
+        UIManager.instance._ShowShop();
         StartCoroutine(HideMissionPanelAndContinue(3f));
+        pod?.StopMovement();
     }
 
     private IEnumerator HideMissionPanelAndContinue(float delay)
@@ -120,37 +119,68 @@ public class GameManager : MonoBehaviour
             if (score >= (ScoreControl.instance?.GetTargetScore() ?? 0))
             {
                 UIManager.instance.ShowNotification("Mission Complete!");
-                SceneManager.LoadScene("Store");
-                NextMission(score);
+                StartCoroutine(WaitBeforeNextMission(score));
+                pod?.StopMovement();
+
             }
             else
             {
                 UIManager.instance.ShowNotification("Mission Failed! \n Do you want to try again?");
                 ScoreControl.instance?.StartNewGame();
-                Time.timeScale = 0;
+                pod?.StopMovement();
             }
         }
     }
 
-    private void ResetGameForNewLevel()
+    public void ResetGameForNewLevel()
     {
         spawner?.ResetLevel();
         initialTime += 15;
-        UIManager.instance.UpdateTime(initialTime);
+        timeLeft = initialTime; 
+        UIManager.instance.UpdateTime(timeLeft);
+
         ScoreControl.instance?.InitializeScore(ScoreControl.instance.GetCurrentScore(), _nextScore);
         UIManager.instance.UpdateNumber(0);
+
+        pod?.StopMovement();
         Time.timeScale = 1;
         StartCountdown();
     }
 
+    private IEnumerator WaitBeforeNextMission(int score)
+    {
+        yield return new WaitForSeconds(2f);
+        UIManager.instance.HidePanels();
+        Time.timeScale = 0;
+        GameObject nextMissionButton = GameObject.Find("NextMissonbutt");
+        if (nextMissionButton != null)
+        {
+            nextMissionButton.SetActive(false);
+        }
+        GameObject NoButt = GameObject.Find("NoButt");
+        if (NoButt != null)
+        {
+            NoButt.SetActive(false);
+        }
+        NextMission(score);
+    }
     public void HomeButton() => SceneManager.LoadScene("MainMenu");
-    public void PlayAgainButton() => SceneManager.LoadScene("GamePlay");
+    public void PlayAgainButton() { ScoreControl.instance?.StartNewGame();  SceneManager.LoadScene("GamePlay"); }
     public void PlayButton() { UIManager.instance.HidePanels(); Time.timeScale = 1; StartCountdown(); }
     public void ContinueButton() { UIManager.instance.HidePanels(); Time.timeScale = 1; StartCountdown(); }
     public void StopButton() { Time.timeScale = 0; UIManager.instance.menuGamePanel?.SetActive(true); StopCountdown(); }
 
     private void StopCountdown()
     {
+        if (countdownCoroutine != null)
+        {
+            StopCoroutine(countdownCoroutine);
+            countdownCoroutine = null;
+        }
+    }
+    public void PauseGameForShop()
+    {
+        pod?.StopMovement();
         if (countdownCoroutine != null)
         {
             StopCoroutine(countdownCoroutine);

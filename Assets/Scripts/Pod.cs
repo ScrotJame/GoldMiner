@@ -1,14 +1,16 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static GoldBase;
 
 public class Pod : MonoBehaviour
 {
+    public static Pod instance;
     private float _angle, _potion;
     private bool _flagCollect, _hasScored;
     public int _score, _count;
-    private bool isAlive = true, _click = true;
-    private float flag = 0;
+    private bool isAlive = true, _click = true; 
+    private bool isMoving = true;
 
     private Animator _anim, _animMiner;
     private AudioSource _audio;
@@ -28,6 +30,36 @@ public class Pod : MonoBehaviour
     [SerializeField] private GameObject dynamitePrefab;
 
     private bool isUsingDynamite = false;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return; 
+        }
+    }
+
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (this == null || gameObject == null) return; 
+
+        if (scene.name == "GamePlay")
+        {
+            gameObject.SetActive(true);
+        }
+        else if (scene.name == "Store")
+        {
+            gameObject.SetActive(false);
+        }
+    }
 
     private void Start()
     {
@@ -203,7 +235,15 @@ public class Pod : MonoBehaviour
             }
         }
     }
+    public void StopMovement()
+    {
+        isMoving = false;
+    }
 
+    public void ResumeMovement()
+    {
+        isMoving = true;
+    }
     public void ResetHookPosition()
     {
         if (_transformPostion != null)
@@ -277,17 +317,6 @@ public class Pod : MonoBehaviour
         else
         {
             Debug.Log("Dynamite did not destroy item.");
-        }
-    }
-    private void CheckMissionComplete()
-    {
-        if (ScoreControl.instance != null && ScoreControl.instance.GetCurrentScore() >= ScoreControl.instance.GetTargetScore())
-        {
-            Debug.Log("Mission completed!");
-            if (GameManager.instance != null)
-            {
-                GameManager.instance.NextMission(ScoreControl.instance.GetCurrentScore());
-            }
         }
     }
 }

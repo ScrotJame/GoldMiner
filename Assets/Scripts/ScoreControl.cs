@@ -7,6 +7,7 @@ public class ScoreControl : MonoBehaviour
     private int currentScore = 0;
     private int targetScore = 1000;
     private int highScore = 0;
+    private int initialTime = 0;
 
     private void Awake()
     {
@@ -78,6 +79,7 @@ public class ScoreControl : MonoBehaviour
     {
         currentScore = 0;
         targetScore = 650;
+        initialTime =20;
         SaveData();
         UpdateUI();
     }

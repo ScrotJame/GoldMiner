@@ -108,7 +108,6 @@ public class Spawner : MonoBehaviour
 
     public void ResetLevel()
     {
-        // Xóa các đối tượng đã spawn
         foreach (var obj in GameObject.FindObjectsOfType<GameObject>())
         {
             string objName = obj.name.Replace("(Clone)", "").Trim();
