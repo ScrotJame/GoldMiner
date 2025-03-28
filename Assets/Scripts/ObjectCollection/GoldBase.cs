@@ -20,7 +20,6 @@ public class GoldBase : MonoBehaviour
     // Update is called once per frame
     public virtual void GotObj()
     {
-        Debug.Log("You got ");
         currentState = GoldState.BeingGrabbed;
         if (_animator != null)
         {
@@ -31,7 +30,6 @@ public class GoldBase : MonoBehaviour
 
     public virtual void Collected()
     {
-        Debug.Log("You collected ");
         currentState = GoldState.Collected;
         if (_animator != null)
         {
@@ -46,15 +44,6 @@ public class GoldBase : MonoBehaviour
         {
             linePod.ResetHook();
         }
-    }
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        Debug.Log($"Triggered with: {collision.gameObject.name}");
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        Debug.Log($"Collided with: {collision.gameObject.name}");
     }
     public void TakeDamage()
     {

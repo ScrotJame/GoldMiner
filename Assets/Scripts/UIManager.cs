@@ -2,12 +2,12 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using System;
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
-    //UI gameplay
+
+    // UI gameplay
     public Text timeText;
     public Text numberText;
     public Text notificationText;
@@ -15,7 +15,7 @@ public class UIManager : MonoBehaviour
     public Text targetScoreText;
     public Text highScoreText;
 
-    //UI Notification
+    // UI Notification
     public GameObject gameNotificationPanel;
     public GameObject menuGamePanel;
     public GameObject missionPanel;
@@ -23,15 +23,6 @@ public class UIManager : MonoBehaviour
     public Text missionTargetText;
     private Coroutine missionPanelCoroutine;
 
-    //UI store
-    [SerializeField] private GameObject shopUIPrefab;
-    private GameObject shopUIInstance;
-    public Text goldText;
-    public Button dynamiteButton;
-    public Button luckButton;
-    public Button drugButton;
-    public Button strengthButton;
-    public Button continueButton;
     private void Awake()
     {
         if (instance == null)
@@ -44,7 +35,30 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (missionPanelCoroutine != null)
+        {
+            StopCoroutine(missionPanelCoroutine);
+            missionPanelCoroutine = null;
+        }
+    }
+    void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
+        }
+        if (missionPanelCoroutine != null)
+        {
+            StopCoroutine(missionPanelCoroutine);
+            missionPanelCoroutine = null;
+        }
+    }
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "GamePlay")
@@ -58,25 +72,15 @@ public class UIManager : MonoBehaviour
             gameNotificationPanel = GameObject.Find("Notifice");
             menuGamePanel = GameObject.Find("MenuPause");
             missionPanel = GameObject.Find("NotifMission");
-            missionTargetText = GameObject.Find("MissiontargetText").GetComponentInChildren<Text>();
+            missionTargetText = GameObject.Find("MissiontargetText")?.GetComponentInChildren<Text>();
             if (missionPanel != null)
             {
                 missionPanel.SetActive(true);
                 StartCoroutine(HideMissionPanelAfterDelay(3f));
             }
-
-            goldText = GameObject.Find("ScoreStore")?.GetComponent<Text>();
-            dynamiteButton = GameObject.Find("Dynamite")?.GetComponent<Button>();
-            drugButton = GameObject.Find("Drug")?.GetComponent<Button>();
-            luckButton = GameObject.Find("Luck")?.GetComponent<Button>();
-            strengthButton = GameObject.Find("Strength")?.GetComponent<Button>();
-            continueButton = GameObject.Find("ContinueButton")?.GetComponent<Button>();
         }
     }
-    public void UpdateTime(int time)
-    {
-        if (timeText != null) timeText.text = time.ToString();
-    }
+
     public void _ShowShop()
     {
         if (GameManager.instance == null)
@@ -85,71 +89,22 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (shopUIInstance == null && shopUIPrefab != null)
+        if (StoreManager.Instance == null)
         {
-            shopUIInstance = Instantiate(shopUIPrefab, transform); 
-            storePanel = shopUIInstance.transform.Find("ShopPanel")?.gameObject;
-
-            if (storePanel != null)
-            {
-                goldText = storePanel.transform.Find("ScoreStore")?.GetComponent<Text>();
-                dynamiteButton = storePanel.transform.Find("Dynamite")?.GetComponent<Button>();
-                drugButton = storePanel.transform.Find("Drug")?.GetComponent<Button>();
-                luckButton = storePanel.transform.Find("Luck")?.GetComponent<Button>();
-                strengthButton = storePanel.transform.Find("Strength")?.GetComponent<Button>();
-                continueButton = storePanel.transform.Find("ContinueButton")?.GetComponent<Button>();
-
-                if (dynamiteButton != null) dynamiteButton.onClick.AddListener(BuyDynamite);
-                if (drugButton != null) drugButton.onClick.AddListener(BuyDrug);
-                if (luckButton != null) luckButton.onClick.AddListener(BuyLuck);
-                if (strengthButton != null) strengthButton.onClick.AddListener(BuyStrength);
-                if (continueButton != null) continueButton.onClick.AddListener(CloseShop);
-            }
-            else
-            {
-                Debug.LogError("ShopPanel not found in ShopUI prefab!");
-            }
+            Debug.LogError("StoreManager.Instance is null!");
+            return;
         }
 
-        if (storePanel != null)
-        {
-            storePanel.SetActive(true);
-            GameManager.instance.PauseGameForShop();  
-        }
-        else
-        {
-            Debug.LogError("storePanel is null!");
-        }
-
+        StoreManager.Instance.ShowShop();
     }
 
-    private void BuyStrength()
+    public void _CloseShop()
     {
-        throw new NotImplementedException();
     }
 
-    private void BuyLuck()
+    public void UpdateTime(int time)
     {
-        throw new NotImplementedException();
-    }
-
-    private void BuyDrug()
-    {
-        throw new NotImplementedException();
-    }
-
-    private void BuyDynamite()
-    {
-        throw new NotImplementedException();
-    }
-
-    private void CloseShop()
-    {
-        if (storePanel != null)
-        {
-            storePanel.SetActive(false);
-            GameManager.instance.ResetGameForNewLevel();
-        }
+        if (timeText != null) timeText.text = time.ToString();
     }
 
     public void UpdateNumber(int number)
@@ -185,6 +140,7 @@ public class UIManager : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(delay);
         missionPanel?.SetActive(false);
+        missionPanelCoroutine = null; // Đặt lại coroutine
     }
 
     public void HidePanels()
@@ -193,6 +149,7 @@ public class UIManager : MonoBehaviour
         gameNotificationPanel?.SetActive(false);
         missionPanel?.SetActive(false);
     }
+
     public void UpdateScoreUI(int score)
     {
         if (scoreText != null)

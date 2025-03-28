@@ -452,7 +452,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &75745929
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1435,6 +1435,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 412253773}
   m_CullTransparentMesh: 1
+--- !u!1 &448307030
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 448307032}
+  - component: {fileID: 448307031}
+  m_Layer: 0
+  m_Name: UIControl
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &448307031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448307030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d47aaed46dde45346811e7ae8f9b3464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeText: {fileID: 898241465}
+  numberText: {fileID: 1151279725}
+  notificationText: {fileID: 0}
+  scoreText: {fileID: 2120196558}
+  targetScoreText: {fileID: 1582453291}
+  highScoreText: {fileID: 0}
+  gameNotificationPanel: {fileID: 948856257}
+  menuGamePanel: {fileID: 865754317}
+  missionPanel: {fileID: 412253773}
+  storePanel: {fileID: 0}
+  missionTargetText: {fileID: 909876822}
+--- !u!4 &448307032
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448307030}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4051,18 +4106,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c647e5cd5e0d9774f8ee6c2371c59a18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoneyUI: {fileID: 0}
-  StoreItemUI:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  ShopItems:
-  - {fileID: 11400000, guid: f9173f14eb40da6468a4f628457bbe92, type: 2}
-  - {fileID: 11400000, guid: 6ec86845b7107b549aef6019d5d8395c, type: 2}
-  - {fileID: 11400000, guid: 0dbd52b770d7adf42a90537c237a532b, type: 2}
-  StorePanel: {fileID: 0}
-  purchasedItems: []
+  shopUIPrefab: {fileID: 8487517196016469006, guid: 0e9e21210b80c7448a1b009828e479e3, type: 3}
+  mainCanvas: {fileID: 0}
+  scoreText: {fileID: 0}
+  dynamitePriceText: {fileID: 0}
+  drugPriceText: {fileID: 0}
+  luckPriceText: {fileID: 0}
+  strengthPriceText: {fileID: 0}
+  owner: {fileID: -4496291107314991248, guid: 15dd9f850c6892041bdda69cf266489d, type: 3}
+  hookSpeed: 1
+  upPriceDia: 10
+  dynamitePower: 1
+  luckMultiplier: 1
 --- !u!4 &1997493003
 Transform:
   m_ObjectHideFlags: 0
@@ -4583,3 +4638,4 @@ SceneRoots:
   - {fileID: 830866258}
   - {fileID: 563083760}
   - {fileID: 1997493003}
+  - {fileID: 448307032}

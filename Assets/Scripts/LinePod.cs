@@ -53,10 +53,9 @@ public class LinePod : MonoBehaviour
 
     public void ResetHook()
     {
-        Debug.Log("Gold destroyed, resetting hook!");
         if (_anim != null)
         {
-            _anim.SetBool("got", false); // Reset animation
+            _anim.SetBool("got", false); 
         }
     }
 

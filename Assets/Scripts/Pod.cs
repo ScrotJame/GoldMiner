@@ -119,7 +119,7 @@ public class Pod : MonoBehaviour
 
     void Update()
     {
-        if (Time.timeScale == 0) return;
+        if (Time.timeScale == 0 || !isMoving) return;
         _HookGetObject();
     }
 
@@ -174,11 +174,6 @@ public class Pod : MonoBehaviour
                             if (ScoreControl.instance != null)
                             {
                                 ScoreControl.instance.AddScore(goldPoints);
-                                Debug.Log("Score added: " + goldPoints + ", Total: " + ScoreControl.instance.GetCurrentScore());
-                            }
-                            else
-                            {
-                                Debug.LogError("ScoreControl.instance is null!");
                             }
                         }
                         _transformPostion = null;
@@ -194,7 +189,6 @@ public class Pod : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Gold") || collision.gameObject.CompareTag("TNT"))
         {
-            Debug.Log("Got " + collision.gameObject.tag + "!");
             _state = StateMoc._rewind;
             _transformPostion = collision.gameObject.transform;
             _transformPostion.SetParent(transform);
@@ -209,19 +203,12 @@ public class Pod : MonoBehaviour
 
             if (mouse != null && mouse.RewindObject != null)
             {
-                Debug.Log("Mouse found! Setting state to BeingGrabbed...");
                 _slow = mouse.RewindObject.weight;
                 mouse.currentState = GoldState.BeingGrabbed;
-                Debug.Log($"Collected Mouse! Weight: {mouse.RewindObject.weight}");
             }
             else if (_gold != null && _gold.RewindObject != null)
             {
                 _slow = _gold.RewindObject.weight;
-                Debug.Log($"Collected {collision.gameObject.tag}! Weight: {_gold.RewindObject.weight}, Points: {_gold.RewindObject.point}");
-            }
-            else
-            {
-                Debug.LogWarning("DataObject not found on " + collision.gameObject.name);
             }
 
             Animator mouseAnim = mouse?.GetComponent<Animator>();
@@ -235,15 +222,9 @@ public class Pod : MonoBehaviour
             }
         }
     }
-    public void StopMovement()
-    {
-        isMoving = false;
-    }
+    public void StopMovement()    { isMoving = false;    }
 
-    public void ResumeMovement()
-    {
-        isMoving = true;
-    }
+    public void ResumeMovement()    { isMoving = true;    }
     public void ResetHookPosition()
     {
         if (_transformPostion != null)
@@ -265,8 +246,6 @@ public class Pod : MonoBehaviour
 
         if (_anim != null) _anim.SetBool("got", false);
         if (_animMiner != null) _animMiner.Play("MinerBaseState");
-
-        Debug.Log("Hook reset to initial position!");
     }
 
     public void UseDynamite()

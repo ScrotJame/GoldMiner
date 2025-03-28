@@ -62,9 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Miner.cs" />
+    <Compile Include="Assets\Scripts\GameAsset.cs" />
     <Compile Include="Assets\Scripts\GameControll.cs" />
     <Compile Include="Assets\Scripts\Spawner.cs" />
-    <Compile Include="Assets\Scripts\ShopControll\Store.cs" />
     <Compile Include="Assets\Scripts\Player\Inventory.cs" />
     <Compile Include="Assets\Pull.cs" />
     <Compile Include="Assets\Scripts\ObjectCollection\GoldBase.cs" />
@@ -76,18 +76,22 @@
     <Compile Include="Assets\Scripts\Screen\LoadingScreen.cs" />
     <Compile Include="Assets\Scripts\ObjectCollection\BoomItem.cs" />
     <Compile Include="Assets\Scripts\Item\DynamiteItem.cs" />
+    <Compile Include="Assets\GameDataManager.cs" />
     <Compile Include="Assets\Scripts\Pod.cs" />
     <Compile Include="Assets\Scripts\Configuration\ShopItem.cs" />
     <Compile Include="Assets\Scripts\Item\LuckItem.cs" />
+    <Compile Include="Assets\Scripts\ShopControll\ItemShopUI.cs" />
     <Compile Include="Assets\Scripts\Item\ItemData.cs" />
     <Compile Include="Assets\Scripts\LinePod.cs" />
     <Compile Include="Assets\Scripts\Item\StrengItem.cs" />
+    <Compile Include="Assets\Scripts\Item\ItemShopData_UI.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\BackgroundScale.cs" />
     <Compile Include="Assets\Scripts\Screen\LoadScene.cs" />
     <Compile Include="Assets\Scripts\Item\DrugItem.cs" />
     <Compile Include="Assets\InputButton.cs" />
     <Compile Include="Assets\Scripts\ShopControll\StoreManger.cs" />
+    <Compile Include="Assets\Scripts\ShopControll\StoreItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -70,11 +70,10 @@ public class Spawner : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning($"Failed to find spawn point for {spawnable.objectType}");
+                   
                     break;
                 }
             }
-            Debug.Log($"Spawned {itemsToSpawn} {spawnable.objectType}");
         }
     }
 
@@ -90,7 +89,6 @@ public class Spawner : MonoBehaviour
             if (!IsPositionOccupied(randomPoint))
                 return randomPoint;
         }
-        Debug.LogWarning("Could not find a valid spawn point after max attempts.");
         return Vector2.zero;
     }
 
@@ -119,14 +117,11 @@ public class Spawner : MonoBehaviour
         isLuckActive = false;
         usedPositions.Clear();
         SpawnObjects();
-
-        Debug.Log("New level has been created!");
     }
     public IEnumerator ApplyLuckBoost(float duration)
     {
         isLuckActive = true;
         yield return new WaitForSeconds(duration);
         isLuckActive = false;
-        Debug.Log("Luck boost ended.");
     }
 }
