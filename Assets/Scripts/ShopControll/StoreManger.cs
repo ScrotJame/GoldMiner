@@ -42,37 +42,45 @@ public class StoreManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
 
-        // Tìm Canvas ban đầu
         if (mainCanvas == null)
         {
             mainCanvas = FindObjectOfType<Canvas>();
+            if (mainCanvas != null)
+            {
+                DontDestroyOnLoad(mainCanvas.gameObject);
+            }
+            else
+            {
+                Debug.LogError("No Canvas found in the scene during Awake! Please add a Canvas to the scene.");
+            }
         }
     }
 
     public void ShowShop()
     {
+        Debug.Log("ShowShop: Called");
         GameManager.instance.PauseGameForShop();
 
-        // Kiểm tra và tìm lại Canvas nếu cần
         if (mainCanvas == null || mainCanvas.Equals(null))
         {
             mainCanvas = FindObjectOfType<Canvas>();
             if (mainCanvas == null)
             {
-                Debug.LogError("Không tìm thấy Canvas trong scene hiện tại!");
+                Debug.LogError("ShowShop: Không tìm thấy Canvas trong scene hiện tại!");
                 return;
             }
         }
 
         if (shopInstance == null)
         {
+            Debug.Log("ShowShop: Instantiating shopUIPrefab");
             shopInstance = Instantiate(shopUIPrefab, mainCanvas.transform);
             shopInstance.transform.localPosition = Vector3.zero;
             shopInstance.transform.localScale = Vector3.one;
@@ -114,15 +122,15 @@ public class StoreManager : MonoBehaviour
             if (continueButton != null)
             {
                 continueButton.onClick.AddListener(HideShop);
-                Debug.Log("Đã gán sự kiện cho nút Continue.");
+                Debug.Log("ShowShop: Đã gán sự kiện cho nút Continue.");
             }
             else
             {
-                Debug.LogError("Không tìm thấy nút Continue trong ShopUIPanel!");
+                Debug.LogError("ShowShop: Không tìm thấy nút Continue trong ShopUIPanel!");
             }
         }
         shopInstance.SetActive(true);
-        Debug.Log("Đã mở Shop: " + shopInstance.activeSelf);
+        Debug.Log("ShowShop: Đã mở Shop: " + shopInstance.activeSelf);
         UpdateUI();
     }
 
@@ -161,7 +169,6 @@ public class StoreManager : MonoBehaviour
 
             try
             {
-                GameManager.instance.NextMission(ScoreControl.instance.GetCurrentScore());
                 GameManager.instance.ResumeGameAfterShop();
             }
             catch (System.Exception e)

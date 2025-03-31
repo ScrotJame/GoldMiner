@@ -9,7 +9,6 @@ public class Pod : MonoBehaviour
     private float _angle, _potion;
     private bool _flagCollect, _hasScored;
     public int _score, _count;
-    private bool isAlive = true, _click = true; 
     private bool isMoving = true;
 
     private Animator _anim, _animMiner;
@@ -35,7 +34,6 @@ public class Pod : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -120,7 +118,10 @@ public class Pod : MonoBehaviour
     void Update()
     {
         if (Time.timeScale == 0 || !isMoving) return;
-        _HookGetObject();
+        if (isMoving)
+        {
+            _HookGetObject();
+        }
     }
 
     protected virtual void _HookGetObject()
@@ -131,7 +132,6 @@ public class Pod : MonoBehaviour
                 if (_animMiner != null) _animMiner.Play("MinerBaseState");
                 if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
                 {
-                    _click = false;
                     _state = StateMoc._click;
                 }
                 _angle += _rotationSpeed;
@@ -151,7 +151,6 @@ public class Pod : MonoBehaviour
                 break;
             case StateMoc._rewind:
                 transform.Translate(Vector3.up * (_scrollSpeed - _slow) * Time.deltaTime);
-                _click = true;
                 float tolerance = 0.1f;
                 if (Mathf.Abs(transform.position.x - _fistPosition.x) < tolerance
                     && Mathf.Abs(transform.position.y - _fistPosition.y) < tolerance)

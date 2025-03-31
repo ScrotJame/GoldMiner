@@ -81,27 +81,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void _ShowShop()
-    {
-        if (GameManager.instance == null)
-        {
-            Debug.LogError("GameManager.instance is null!");
-            return;
-        }
-
-        if (StoreManager.Instance == null)
-        {
-            Debug.LogError("StoreManager.Instance is null!");
-            return;
-        }
-
-        StoreManager.Instance.ShowShop();
-    }
-
-    public void _CloseShop()
-    {
-    }
-
     public void UpdateTime(int time)
     {
         if (timeText != null) timeText.text = time.ToString();
@@ -140,7 +119,7 @@ public class UIManager : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(delay);
         missionPanel?.SetActive(false);
-        missionPanelCoroutine = null; // Đặt lại coroutine
+        missionPanelCoroutine = null;
     }
 
     public void HidePanels()

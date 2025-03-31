@@ -90,6 +90,7 @@
     <Compile Include="Assets\Scripts\Screen\LoadScene.cs" />
     <Compile Include="Assets\Scripts\Item\DrugItem.cs" />
     <Compile Include="Assets\InputButton.cs" />
+    <Compile Include="Assets\Scripts\ItemManager.cs" />
     <Compile Include="Assets\Scripts\ShopControll\StoreManger.cs" />
     <Compile Include="Assets\Scripts\ShopControll\StoreItem.cs" />
   </ItemGroup>

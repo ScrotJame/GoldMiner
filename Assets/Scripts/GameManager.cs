@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     private int timeLeft;
     private int pendingScore;
     private bool shouldStartNextMission = false;
+    private bool returningFromShop = false;
 
     private Coroutine countdownCoroutine;
 
@@ -25,7 +26,6 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -40,14 +40,25 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
         StopAllCoroutines();
     }
-    //Load scene
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
 
-        UIManager.instance.HidePanels();
+        UIManager.instance?.HidePanels();
         spawner = FindObjectOfType<Spawner>();
         pod = FindObjectOfType<Pod>();
+
+        if (spawner == null)
+        {
+            Debug.LogError("Spawner not found in the scene! Cannot proceed.");
+            return;
+        }
+        if (pod == null)
+        {
+            Debug.LogError("Pod not found in the scene! Cannot proceed.");
+            return;
+        }
 
         InitializeLevel();
 
@@ -57,31 +68,49 @@ public class GameManager : MonoBehaviour
             shouldStartNextMission = false;
         }
     }
-    //Level hien tai
+
     private void InitializeLevel()
     {
         timeLeft = initialTime;
-        UIManager.instance.UpdateTime(timeLeft);
-        UIManager.instance.UpdateNumber(0);
+        UIManager.instance?.UpdateTime(timeLeft);
+        UIManager.instance?.UpdateNumber(0);
+
+        if (ScoreControl.instance == null)
+        {
+            Debug.LogError("ScoreControl instance is null! Attempting to find or create one.");
+            ScoreControl.instance = FindObjectOfType<ScoreControl>();
+            if (ScoreControl.instance == null)
+            {
+                Debug.LogError("Could not find or create ScoreControl! Game cannot proceed.");
+                return;
+            }
+        }
+
+        if (ScoreControl.instance.GetTargetScore() == 0)
+        {
+            ScoreControl.instance.SetTargetScore(1000);
+        }
+
         StartCountdown();
     }
-    //Dem nguoc
+
     private void StartCountdown()
     {
         if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
         countdownCoroutine = StartCoroutine(Countdown());
     }
-    
+
     private IEnumerator Countdown()
     {
         while (timeLeft > 0)
         {
-            UIManager.instance.UpdateTime(timeLeft);
+            UIManager.instance?.UpdateTime(timeLeft);
             yield return new WaitForSeconds(1f);
             timeLeft--;
         }
+        if (timeLeft == 0) { Debug.Log("Overtime"); }
 
-        UIManager.instance.UpdateTime(0);
+        UIManager.instance?.UpdateTime(0);
         CheckMissionComplete(ScoreControl.instance?.GetCurrentScore() ?? 0, timeLeft);
     }
 
@@ -90,18 +119,21 @@ public class GameManager : MonoBehaviour
         shouldStartNextMission = true;
         pendingScore = score;
     }
-    //Nhiem vu tiep
+
     public void NextMission(int score)
     {
         Time.timeScale = 0;
         currentLevel++;
-        initialTime = timeLeft + 15;
+        initialTime = 20 + (currentLevel * 6); 
+        timeLeft = initialTime;
         _nextScore = (score > 10000) ? score / 4 + (ScoreControl.instance?.GetTargetScore() ?? 0) : score / 2 + (ScoreControl.instance?.GetTargetScore() ?? 0);
 
+        Debug.Log($"NextMission: score = {score}, _nextScore = {_nextScore}, initialTime = {initialTime}, currentLevel = {currentLevel}");
         ScoreControl.instance?.SetTargetScore(_nextScore);
-        UIManager.instance.ShowMissionPanel(_nextScore);
+        UIManager.instance?.ShowMissionPanel(_nextScore);
         StartCoroutine(HideMissionPanelAndContinue(3f));
         pod?.StopMovement();
+        returningFromShop = false;
     }
 
     private IEnumerator HideMissionPanelAndContinue(float delay)
@@ -109,22 +141,29 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(delay);
         ResetGameForNewLevel();
     }
-    //Check complete
+
     private void CheckMissionComplete(int score, int time)
     {
         if (time <= 0)
         {
             pod?.ResetHookPosition();
-
-            if (score >= (ScoreControl.instance?.GetTargetScore() ?? 0))
+            if (returningFromShop)
             {
-                UIManager.instance.ShowNotification("Mission Complete!");
+                returningFromShop = false;
+                Debug.Log("CheckMissionComplete: Returning from shop, skipping mission check.");
+                return;
+            }
+
+            int targetScore = ScoreControl.instance?.GetTargetScore() ?? 0;
+            if (score >= targetScore)
+            {
+                UIManager.instance?.ShowNotification("Mission Complete!");
                 StartCoroutine(WaitBeforeNextMission(score));
                 pod?.StopMovement();
             }
             else
             {
-                UIManager.instance.ShowNotification("Mission Failed! \n Do you want to try again?");
+                UIManager.instance?.ShowNotification("Mission Failed! \n Do you want to try again?");
                 ScoreControl.instance?.StartNewGame();
                 pod?.StopMovement();
             }
@@ -134,7 +173,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator WaitBeforeNextMission(int score)
     {
         yield return new WaitForSeconds(2f);
-        UIManager.instance.HidePanels();
+        UIManager.instance?.HidePanels();
         Time.timeScale = 0;
         GameObject nextMissionButton = GameObject.Find("NextMissonbutt");
         if (nextMissionButton != null)
@@ -147,35 +186,43 @@ public class GameManager : MonoBehaviour
             NoButt.SetActive(false);
         }
 
-        if (FindObjectOfType<Canvas>() != null)
+        if (StoreManager.Instance != null)
         {
             StoreManager.Instance.ShowShop();
         }
         else
         {
-            Debug.LogWarning("Không tìm thấy Canvas trong scene hiện tại, không thể mở Shop!");
+            Debug.LogError("WaitBeforeNextMission: StoreManager.Instance is null, cannot show shop!");
         }
     }
-    //Choi lai
+
+
     public void ResetGameForNewLevel()
     {
         spawner?.ResetLevel();
         timeLeft = initialTime;
-        UIManager.instance.UpdateTime(timeLeft);
+        UIManager.instance?.UpdateTime(timeLeft);
 
-        ScoreControl.instance?.InitializeScore(ScoreControl.instance.GetCurrentScore(), _nextScore);
-        UIManager.instance.UpdateNumber(0);
+        if (ScoreControl.instance != null)
+        {
+            ScoreControl.instance.InitializeScore(ScoreControl.instance.GetCurrentScore(), _nextScore);
+            UIManager.instance?.UpdateNumber(ScoreControl.instance.GetCurrentScore());
+        }
+        else
+        {
+            Debug.LogWarning("ScoreControl instance is null, cannot initialize score!");
+        }
 
-        pod?.StopMovement();
+        pod?.ResumeMovement();
         Time.timeScale = 1;
         StartCountdown();
     }
 
     public void HomeButton() => SceneManager.LoadScene("MainMenu");
-    public void PlayAgainButton() { ScoreControl.instance?.StartNewGame(); SceneManager.LoadScene("GamePlay"); }
-    public void PlayButton() { UIManager.instance.HidePanels(); Time.timeScale = 1; StartCountdown(); }
-    public void ContinueButton() { UIManager.instance.HidePanels(); Time.timeScale = 1; StartCountdown(); }
-    public void StopButton() { Time.timeScale = 0; UIManager.instance.menuGamePanel?.SetActive(true); StopCountdown(); }
+    public void PlayAgainButton() { ScoreControl.instance?.StartNewGame(); SceneManager.LoadScene("GamePlay"); UIManager.instance.HidePanels(); }
+    public void PlayButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
+    public void ContinueButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
+    public void StopButton() { Time.timeScale = 0; UIManager.instance?.menuGamePanel?.SetActive(true); StopCountdown(); }
 
     private void StopCountdown()
     {
@@ -194,14 +241,35 @@ public class GameManager : MonoBehaviour
             StopCoroutine(countdownCoroutine);
             countdownCoroutine = null;
         }
-        Debug.Log("Game paused for shop.");
     }
 
     public void ResumeGameAfterShop()
     {
+        if (pod == null || pod.Equals(null))
+        {
+        //    pod = FindObjectOfType<Pod>();
+            if (pod == null)
+            {
+                return;
+            }
+        }
+
         pod?.ResumeMovement();
-        UIManager.instance.HidePanels();
+        UIManager.instance?.HidePanels();
         Time.timeScale = 1;
+        timeLeft = initialTime;
+        UIManager.instance?.UpdateTime(timeLeft);
+        returningFromShop = true;
+
+        if (ScoreControl.instance != null)
+        {
+            NextMission(ScoreControl.instance.GetCurrentScore());
+        }
+        else
+        {
+            return;
+        }
+
         StartCountdown();
         Debug.Log("Game resumed after shop.");
     }
@@ -209,7 +277,7 @@ public class GameManager : MonoBehaviour
     public void CollectGold(int amount)
     {
         goldAmount += amount;
-        ScoreControl.instance.AddScore(amount);
+        ScoreControl.instance?.AddScore(amount);
     }
 
     void OnDestroy()

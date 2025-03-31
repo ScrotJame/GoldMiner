@@ -5,9 +5,8 @@ public class ScoreControl : MonoBehaviour
 {
     public static ScoreControl instance;
     private int currentScore = 0;
-    private int targetScore = 1000;
+    private int targetScore, initialTime;
     private int highScore = 0;
-    private int initialTime = 0;
 
     private void Awake()
     {
