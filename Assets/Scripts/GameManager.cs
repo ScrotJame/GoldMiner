@@ -108,8 +108,6 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
             timeLeft--;
         }
-        if (timeLeft == 0) { Debug.Log("Overtime"); }
-
         UIManager.instance?.UpdateTime(0);
         CheckMissionComplete(ScoreControl.instance?.GetCurrentScore() ?? 0, timeLeft);
     }
@@ -163,6 +161,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                ItemManager.Instance.ClearAllItems();   
                 UIManager.instance?.ShowNotification("Mission Failed! \n Do you want to try again?");
                 ScoreControl.instance?.StartNewGame();
                 pod?.StopMovement();
@@ -271,7 +270,6 @@ public class GameManager : MonoBehaviour
         }
 
         StartCountdown();
-        Debug.Log("Game resumed after shop.");
     }
 
     public void CollectGold(int amount)

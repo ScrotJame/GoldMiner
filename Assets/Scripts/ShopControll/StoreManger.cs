@@ -37,6 +37,8 @@ public class StoreManager : MonoBehaviour
     private Button strengthButton;
     private Button continueButton;
 
+    [SerializeField] private Sprite dynamiteSprite;
+
     void Awake()
     {
         if (Instance == null)
@@ -58,29 +60,89 @@ public class StoreManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("No Canvas found in the scene during Awake! Please add a Canvas to the scene.");
+                Debug.LogError("No Canvas found in the scene during Awake!");
             }
+        }
+    }
+
+    public void BuyLuck()
+    {
+        if (ScoreControl.instance.SpendScore(luckPrice))
+        {
+            Spawner.instance.ApplyLuckBoost();
+            Destroy(itemLuck);
+            itemLuck = null;
+            UpdateUI();
+        }
+        else
+        {
+            Debug.Log("Không đủ vàng để mua Luck!");
+        }
+    }
+    public void BuyDynamite()
+    {
+        if (ScoreControl.instance.SpendScore(dynamitePrice))
+        {
+            dynamitePower += 0.5f;
+            Debug.Log("Đã mua Dynamite! Sức mạnh: " + dynamitePower);
+            Spawner.instance.ApplyDrugEffect();
+            Destroy(itemDynamite);
+            itemDynamite = null;
+            UpdateUI();
+        }
+        else
+        {
+            Debug.Log("Không đủ vàng để mua Dynamite!");
+        }
+    }
+
+    public void BuyDrug()
+    {
+        if (ScoreControl.instance.SpendScore(drugPrice))
+        {
+            Debug.Log("Đã mua Drug!");
+            ItemManager.Instance.AddItem("Drug", null, () =>
+            {
+                Spawner.instance.ApplyDrugEffect();
+                UIManager.instance?.ShowNotification("Drug đã được kích hoạt! Tăng giá trị Diamond.");
+            });
+            Destroy(itemDrug);
+            itemDrug = null;
+            UpdateUI();
+        }
+        else
+        {
+            Debug.Log("Không đủ vàng để mua Drug!");
+        }
+    }
+
+    public void BuyStreng()
+    {
+        if (ScoreControl.instance.SpendScore(strengthPrice))
+        {
+            Debug.Log("Đã mua Strength!");
+            ItemManager.Instance.AddItem("Streng", null, () =>
+            {
+                Debug.Log("Strength đã được sử dụng");
+            });
+            Destroy(itemStrength);
+            itemStrength = null;
+            UpdateUI();
         }
     }
 
     public void ShowShop()
     {
-        Debug.Log("ShowShop: Called");
         GameManager.instance.PauseGameForShop();
 
         if (mainCanvas == null || mainCanvas.Equals(null))
         {
             mainCanvas = FindObjectOfType<Canvas>();
-            if (mainCanvas == null)
-            {
-                Debug.LogError("ShowShop: Không tìm thấy Canvas trong scene hiện tại!");
-                return;
-            }
+            if (mainCanvas == null)   {    return;            }
         }
 
         if (shopInstance == null)
         {
-            Debug.Log("ShowShop: Instantiating shopUIPrefab");
             shopInstance = Instantiate(shopUIPrefab, mainCanvas.transform);
             shopInstance.transform.localPosition = Vector3.zero;
             shopInstance.transform.localScale = Vector3.one;
@@ -122,15 +184,9 @@ public class StoreManager : MonoBehaviour
             if (continueButton != null)
             {
                 continueButton.onClick.AddListener(HideShop);
-                Debug.Log("ShowShop: Đã gán sự kiện cho nút Continue.");
-            }
-            else
-            {
-                Debug.LogError("ShowShop: Không tìm thấy nút Continue trong ShopUIPanel!");
             }
         }
         shopInstance.SetActive(true);
-        Debug.Log("ShowShop: Đã mở Shop: " + shopInstance.activeSelf);
         UpdateUI();
     }
 
@@ -138,7 +194,6 @@ public class StoreManager : MonoBehaviour
     {
         if (shopInstance != null)
         {
-            Debug.Log("Bắt đầu đóng Shop...");
 
             if (dynamiteButton != null) dynamiteButton.onClick.RemoveAllListeners();
             if (drugButton != null) drugButton.onClick.RemoveAllListeners();
@@ -165,7 +220,6 @@ public class StoreManager : MonoBehaviour
 
             Destroy(shopInstance);
             shopInstance = null;
-            Debug.Log("Đã đóng và hủy Shop.");
 
             try
             {
@@ -189,70 +243,6 @@ public class StoreManager : MonoBehaviour
         if (itemDrug != null) drugPriceText.text = drugPrice + " Vàng";
         if (itemLuck != null) luckPriceText.text = luckPrice + " Vàng";
         if (itemStrength != null) strengthPriceText.text = strengthPrice + " Vàng";
-    }
-
-    public void BuyDynamite()
-    {
-        if (ScoreControl.instance.SpendScore(dynamitePrice))
-        {
-            dynamitePower += 0.5f;
-            Debug.Log("Đã mua Dynamite! Sức mạnh: " + dynamitePower);
-            Destroy(itemDynamite);
-            itemDynamite = null;
-            UpdateUI();
-        }
-        else
-        {
-            Debug.Log("Không đủ vàng để mua Dynamite!");
-        }
-    }
-
-    public void BuyDrug()
-    {
-        if (ScoreControl.instance.SpendScore(drugPrice))
-        {
-            upPriceDia *= 2;
-            Debug.Log("Đã mua Drug! Giá nâng cấp: " + upPriceDia);
-            Destroy(itemDrug);
-            itemDrug = null;
-            UpdateUI();
-        }
-        else
-        {
-            Debug.Log("Không đủ vàng để mua Drug!");
-        }
-    }
-
-    public void BuyLuck()
-    {
-        if (ScoreControl.instance.SpendScore(luckPrice))
-        {
-            luckMultiplier *= 2;
-            Debug.Log("Đã mua Luck! Hệ số may mắn: " + luckMultiplier);
-            Destroy(itemLuck);
-            itemLuck = null;
-            UpdateUI();
-        }
-        else
-        {
-            Debug.Log("Không đủ vàng để mua Luck!");
-        }
-    }
-
-    public void BuyStreng()
-    {
-        if (ScoreControl.instance.SpendScore(strengthPrice))
-        {
-            hookSpeed *= 2;
-            Debug.Log("Đã mua Strength! Tốc độ móc: " + hookSpeed);
-            Destroy(itemStrength);
-            itemStrength = null;
-            UpdateUI();
-        }
-        else
-        {
-            Debug.Log("Không đủ vàng để mua Strength!");
-        }
     }
 
     void OnDestroy()

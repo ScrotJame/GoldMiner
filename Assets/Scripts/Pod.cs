@@ -6,29 +6,30 @@ using static GoldBase;
 public class Pod : MonoBehaviour
 {
     public static Pod instance;
+
     private float _angle, _potion;
     private bool _flagCollect, _hasScored;
-    public int _score, _count;
     private bool isMoving = true;
-
     private Animator _anim, _animMiner;
     private AudioSource _audio;
     private AudioClip scrollClip, gotClip, useBoomClip;
     private Rigidbody2D _rigidbody2D;
     private Camera _mainCamera;
+    private float _originalScrollSpeed;
+    private bool isUsingDynamite = false;
+    private bool isStrengthActive = false;
+
     public Vector3 _fistPosition;
     public Transform _transformPostion;
+    public int _score, _count;
 
+    private Animator _animHook;
     [SerializeField] public float _scrollSpeed = 2.0f;
     [SerializeField] public float _rotationSpeed = 1.25f;
     [SerializeField] public float _slow;
-
-    private Animator _animHook;
     [SerializeField] private Transform minerTransform;
-
     [SerializeField] private GameObject dynamitePrefab;
 
-    private bool isUsingDynamite = false;
     private void Awake()
     {
         if (instance == null)
@@ -38,7 +39,7 @@ public class Pod : MonoBehaviour
         else
         {
             Destroy(gameObject);
-            return; 
+            return;
         }
     }
 
@@ -47,7 +48,7 @@ public class Pod : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (this == null || gameObject == null) return; 
+        if (this == null || gameObject == null) return;
 
         if (scene.name == "GamePlay")
         {
@@ -61,6 +62,7 @@ public class Pod : MonoBehaviour
 
     private void Start()
     {
+        _originalScrollSpeed = _scrollSpeed;
         Time.timeScale = 1;
         _state = StateMoc._rotation;
 
@@ -73,14 +75,6 @@ public class Pod : MonoBehaviour
                 Transform hook = FindChildByName(moc_0, "Hook");
                 if (hook != null) _animHook = hook.GetComponent<Animator>();
             }
-            else
-            {
-                Debug.LogError("Không tìm thấy moc_0 trong miner!");
-            }
-        }
-        else
-        {
-            Debug.LogError("Miner Transform không được gán trong Inspector!");
         }
 
         _rigidbody2D = GetComponent<Rigidbody2D>();
@@ -167,6 +161,11 @@ public class Pod : MonoBehaviour
                             if (_animMiner != null) _animMiner.Play("MinerRewind");
 
                             int goldPoints = gold.RewindObject.point;
+                            if (Spawner.instance != null && Spawner.instance.IsDrugActive && gold.gameObject.name.Contains("kc_2_0"))
+                            {
+                                goldPoints *= 2;
+                                Debug.Log($"Drug tăng giá trị của Diamond lên {goldPoints}");
+                            }
                             _score += goldPoints;
                             _count++;
 
@@ -221,9 +220,10 @@ public class Pod : MonoBehaviour
             }
         }
     }
-    public void StopMovement()    { isMoving = false;    }
 
-    public void ResumeMovement()    { isMoving = true;    }
+    public void StopMovement() { isMoving = false; }
+    public void ResumeMovement() { isMoving = true; }
+
     public void ResetHookPosition()
     {
         if (_transformPostion != null)
@@ -247,14 +247,13 @@ public class Pod : MonoBehaviour
         if (_animMiner != null) _animMiner.Play("MinerBaseState");
     }
 
-    public void UseDynamite()
+    public bool UseDynamite()
     {
         if (_transformPostion != null && _state == StateMoc._rewind)
         {
             if (dynamitePrefab == null)
             {
-                Debug.LogError("Dynamite Prefab is not assigned in Inspector!");
-                return;
+                return false;
             }
             isUsingDynamite = true;
             GameObject dynamite = Instantiate(dynamitePrefab, minerTransform.position, Quaternion.identity);
@@ -262,23 +261,43 @@ public class Pod : MonoBehaviour
             if (dynamiteScript != null)
             {
                 dynamiteScript.Initialize(minerTransform.position, transform.position, _transformPostion, this);
-                Debug.Log("Dynamite spawned from miner targeting: " + _transformPostion.name);
             }
             else
             {
-                Debug.LogError("DynamiteItem script not found on Dynamite prefab!");
                 Destroy(dynamite);
+                return false;
             }
             if (_animMiner != null) _animMiner.Play("usebom");
             if (_audio != null && useBoomClip != null)
             {
                 _audio.PlayOneShot(useBoomClip);
             }
+            return true;
         }
         else
         {
-            Debug.Log("No item to destroy with Dynamite or not in rewind state!");
+            return false;
         }
+    }
+
+    public bool UseStreng()
+    {
+        if (isStrengthActive)
+        {
+            return false;
+        }
+        _scrollSpeed *= 1.5f;
+        isStrengthActive = true;
+
+        StartCoroutine(ResetScrollSpeedAfterDelay(15f));
+        return true;
+    }
+
+    private System.Collections.IEnumerator ResetScrollSpeedAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        _scrollSpeed = _originalScrollSpeed;
+        isStrengthActive = false;
     }
 
     public void OnDynamiteFinished(bool itemDestroyed)
@@ -290,11 +309,10 @@ public class Pod : MonoBehaviour
             _transformPostion = null;
             if (_animHook != null) _animHook.SetBool("got", false);
             if (_animMiner != null) _animMiner.Play("MinerRewind");
-            Debug.Log("Dynamite destroyed item, _slow set to 0.");
         }
         else
         {
-            Debug.Log("Dynamite did not destroy item.");
+            return;
         }
     }
 }

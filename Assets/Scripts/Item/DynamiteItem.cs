@@ -20,7 +20,6 @@ public class DynamiteItem : MonoBehaviour
 
         if (targetItem == null || pod == null)
         {
-            Debug.LogWarning("Target item or Pod is null in DynamiteItem.Initialize! Destroying Dynamite.");
             Destroy(gameObject);
         }
     }
@@ -29,7 +28,6 @@ public class DynamiteItem : MonoBehaviour
     {
         if (targetItem == null || pod == null)
         {
-            Debug.Log("Target item or Pod lost! Destroying Dynamite.");
             Destroy(gameObject);
             return;
         }
@@ -38,8 +36,7 @@ public class DynamiteItem : MonoBehaviour
 
         if (Vector3.Distance(transform.position, targetItem.position) > 10f)
         {
-            Debug.Log("Dynamite exceeded max distance. Destroying.");
-            pod.OnDynamiteFinished(false); // khong pha vat pham khi di
+            pod.OnDynamiteFinished(false); 
             Destroy(gameObject);
         }
     }
@@ -48,13 +45,12 @@ public class DynamiteItem : MonoBehaviour
     {
         if (targetItem != null && collision.transform == targetItem)
         {
-            Debug.Log("Dynamite hit item: " + collision.gameObject.name);
             Destroy(collision.gameObject);
             if (audioSource != null && explosionClip != null)
             {
                 audioSource.PlayOneShot(explosionClip);
             }
-            pod.OnDynamiteFinished(true); // pa huy vat pham
+            pod.OnDynamiteFinished(true); 
             Destroy(gameObject);
         }
     }

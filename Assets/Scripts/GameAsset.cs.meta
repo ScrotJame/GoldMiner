@@ -1,2 +1,16 @@
 fileFormatVersion: 2
 guid: 8c9787fe314653d42ae4fa0d46c5f575
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Dynamite: {fileID: -3291993922650811414, guid: 96478a970a836584a866755f2f9bad1b, type: 3}
+  - Drug: {fileID: -2340585588832015361, guid: f3d4b427f17be3d4d82898bb6af614e4, type: 3}
+  - Luck: {fileID: -1755270767226411818, guid: 86782534438fdfc4ca050773683c5aa9, type: 3}
+  - Streng: {fileID: 2144418138029272856, guid: 26ccdf57b46c57a4f85cc989505ba556, type: 3}
+  - Clock: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

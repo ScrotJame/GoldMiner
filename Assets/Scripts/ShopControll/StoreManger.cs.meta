@@ -1,2 +1,20 @@
 fileFormatVersion: 2
 guid: c647e5cd5e0d9774f8ee6c2371c59a18
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - shopUIPrefab: {instanceID: 0}
+  - mainCanvas: {instanceID: 0}
+  - scoreText: {instanceID: 0}
+  - dynamitePriceText: {instanceID: 0}
+  - drugPriceText: {instanceID: 0}
+  - luckPriceText: {instanceID: 0}
+  - strengthPriceText: {instanceID: 0}
+  - owner: {instanceID: 0}
+  - dynamiteSprite: {fileID: -3291993922650811414, guid: 96478a970a836584a866755f2f9bad1b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

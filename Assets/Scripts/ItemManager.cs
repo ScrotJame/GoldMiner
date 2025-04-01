@@ -8,11 +8,12 @@ public class ItemManager : MonoBehaviour
     public static ItemManager Instance;
 
     [SerializeField] private GameObject[] itemsUIPrefab; 
-    [SerializeField] private Transform itemsContainer;  // Container hiển thị button trong gameplay 
+    [SerializeField] private Transform itemsContainer;  
 
-    private List<ItemData> ownedItems = new List<ItemData>(); // Danh sách item đã mua
+    private List<ItemData> ownedItems = new List<ItemData>(); 
     private Dictionary<string, GameObject> itemButtons = new Dictionary<string, GameObject>(); 
 
+    private bool isHaveItems = false;
     private void Awake()
     {
         if (Instance == null)
@@ -28,7 +29,6 @@ public class ItemManager : MonoBehaviour
 
     void Start()
     {
-        // Tìm itemsContainer trong Canvas
         if (itemsContainer == null)
         {
             Canvas canvas = FindObjectOfType<Canvas>();
@@ -38,7 +38,6 @@ public class ItemManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("ItemManager: Không tìm thấy Canvas trong scene!");
                 return;
             }
         }
@@ -46,17 +45,24 @@ public class ItemManager : MonoBehaviour
 
     public void AddItem(string itemName, Sprite itemIcon = null, System.Action onUse = null)
     {
-        ItemData item = ownedItems.Find(i => i.itemName == itemName);
-        if (item != null)
+        if (itemName == "Dynamite" || itemName == "Streng")
         {
-            item.quantity++;
+            ItemData item = ownedItems.Find(i => i.itemName == itemName);
+            if (item != null)
+            {
+                item.quantity++;
+            }
+            else
+            {
+                item = new ItemData(itemName, 1, itemIcon, onUse);
+                ownedItems.Add(item);
+            }
+            ShowItemButton(item);
         }
         else
         {
-            item = new ItemData(itemName, 1, itemIcon, onUse);
-            ownedItems.Add(item);
+            onUse?.Invoke();
         }
-        ShowItemButton(item);
     }
 
     private void ShowItemButton(ItemData item)
@@ -110,33 +116,53 @@ public class ItemManager : MonoBehaviour
         Text quantityText = buttonObj.transform.Find("QuantityText")?.GetComponent<Text>();
         if (quantityText != null) quantityText.text = "x" + item.quantity;
     }
-
+    public void ClearAllItems()
+    {
+        
+        foreach (var button in itemButtons.Values)
+        {
+            Destroy(button);
+        }
+        itemButtons.Clear();
+        ownedItems.Clear();
+    }
     public void UseItem(string itemName)
     {
         ItemData item = ownedItems.Find(i => i.itemName == itemName);
         if (item != null && item.quantity > 0)
         {
-            item.onUse?.Invoke(); 
-            item.quantity--;
-
-            if (item.quantity <= 0)
+            bool useSuccess = false;
+            if (item.onUse != null)
             {
-                ownedItems.Remove(item);
-                if (itemButtons.ContainsKey(itemName))
+                var previousQuantity = item.quantity;
+                item.onUse.Invoke();
+                if (item.itemName == "Dynamite")
                 {
-                    Destroy(itemButtons[itemName]);
-                    itemButtons.Remove(itemName);
+                    useSuccess = Pod.instance.UseDynamite();
+                }
+                else if (item.itemName == "Streng")
+                {
+                    useSuccess = true;
+                    Pod.instance.UseStreng();
                 }
             }
-            else
+            if (useSuccess)
             {
-                UpdateButtonUI(item);
+                item.quantity--;
+                if (item.quantity <= 0)
+                {
+                    ownedItems.Remove(item);
+                    if (itemButtons.ContainsKey(itemName))
+                    {
+                        Destroy(itemButtons[itemName]);
+                        itemButtons.Remove(itemName);
+                    }
+                }
+                else
+                {
+                    UpdateButtonUI(item);
+                }
             }
-            Debug.Log($"Đã sử dụng {itemName}. Còn lại: {item.quantity}");
-        }
-        else
-        {
-            Debug.Log($"Không có {itemName} để sử dụng!");
         }
     }
 

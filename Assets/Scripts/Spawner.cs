@@ -16,16 +16,19 @@ public class Spawner : MonoBehaviour
         [HideInInspector]
         public string objectType => prefab != null ? prefab.name : "Unknown";
     }
-    private bool isLuckActive = false;
-    private float diamondLuckBoost = 0.5f;
-
+    private bool isLuckActive ;
+    private float diamondLuckBoost = 2.25f;
+    private bool applyLuckToNextLevel = false;
+    private bool applyDrugtoNextLevel = false;
     [SerializeField] private SpawnableObject[] spawnableObjects; 
     [SerializeField] private int maxAttempts = 1000000000;          
     [SerializeField] private float minSpawnDistance = 1.5f;    
     [SerializeField] private Vector2 spawnAreaMin = new Vector2(-6.8f, -4.5f); 
     [SerializeField] private Vector2 spawnAreaMax = new Vector2(6.8f, 0.17f);  
 
-    private HashSet<Vector2> usedPositions = new HashSet<Vector2>(); 
+    private HashSet<Vector2> usedPositions = new HashSet<Vector2>();
+    private bool isDrugActive;
+
     private void Awake()
     {
         if (instance == null)
@@ -46,36 +49,41 @@ public class Spawner : MonoBehaviour
 
     private void SpawnObjects()
     {
-        usedPositions.Clear(); 
-        int currentLevel = GameManager.instance != null ? GameManager.instance.currentLevel: 1  ;
+        usedPositions.Clear();
+        int currentLevel = GameManager.instance != null ? GameManager.instance.currentLevel : 1;
+        Debug.Log("Luck Active: " + isLuckActive);
+
         foreach (var spawnable in spawnableObjects)
         {
             int itemsToSpawn = Random.Range(spawnable.minCount, spawnable.maxCount + 1);
+            float spawnChance = spawnable.spawnChance;
+            if (isLuckActive && spawnable.prefab.name == "kc_2_0")
+            {
+                spawnChance *= diamondLuckBoost;  
+                Debug.Log($"Luck Active! Tăng tỷ lệ xuất hiện {spawnable.prefab.name} lên {spawnChance}");
+            }
 
             for (int i = 0; i < itemsToSpawn; i++)
             {
                 float chance = Random.value;
-                float adjustedChance = spawnable.spawnChance * (currentLevel / 10f);
-                if (isLuckActive && spawnable.objectType == "Diamond")
-                {
-                    adjustedChance = Mathf.Min(1f, spawnable.spawnChance + diamondLuckBoost);
-                }
-                if (chance <= adjustedChance ) ;
+
                     Vector2 spawnPoint = GetValidSpawnPoint();
-                if (spawnPoint != Vector2.zero)
-                {
-                    GameObject spawnedObject = Instantiate(spawnable.prefab, spawnPoint, Quaternion.identity);
-                    spawnedObject.name = spawnable.prefab.name; 
-                    usedPositions.Add(spawnPoint);
-                }
-                else
-                {
-                   
-                    break;
-                }
+                    if (spawnPoint != Vector2.zero)
+                    {
+                        GameObject spawnedObject = Instantiate(spawnable.prefab, spawnPoint, Quaternion.identity);
+                        spawnedObject.name = spawnable.prefab.name;
+                        usedPositions.Add(spawnPoint);
+
+                        if (spawnable.prefab.name == "kc_2_0")
+                        {
+                            Debug.Log($"Spawned {spawnedObject.name} at {spawnPoint} with adjusted chance: {spawnChance}");
+                        }
+                    }
+                
             }
         }
     }
+
 
     private Vector2 GetValidSpawnPoint()
     {
@@ -114,14 +122,35 @@ public class Spawner : MonoBehaviour
                 Destroy(obj);
             }
         }
-        isLuckActive = false;
+        if (applyLuckToNextLevel || applyDrugtoNextLevel)
+        {
+            isLuckActive = true;
+            isDrugActive = true;
+            applyLuckToNextLevel = false;
+            applyDrugtoNextLevel = false;
+            Debug.Log("Applying luck boost to this level");
+        }
+        else
+        {
+            isLuckActive = false;
+            isDrugActive = false;
+        }
         usedPositions.Clear();
         SpawnObjects();
     }
-    public IEnumerator ApplyLuckBoost(float duration)
+    public void ApplyLuckBoost()
     {
-        isLuckActive = true;
-        yield return new WaitForSeconds(duration);
-        isLuckActive = false;
+        applyLuckToNextLevel = true;
+        Debug.Log("Luck will be applied to the next level");
+    }
+
+    public void ApplyDrugEffect()
+    {
+        applyDrugtoNextLevel=true;
+        Debug.Log("Drug đã được kích hoạt! Tăng giá trị vật phẩm thu thập được.");
+    }
+    public bool IsDrugActive
+    {
+        get { return isDrugActive; }
     }
 }

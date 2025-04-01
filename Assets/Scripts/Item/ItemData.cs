@@ -6,7 +6,7 @@ public class ItemData
     public string itemName;
     public int quantity;
     public Sprite itemIcon;
-    public System.Action onUse; // Hành động khi sử dụng vật phẩm
+    public System.Action onUse;
 
     public ItemData(string name, int qty, Sprite icon = null, System.Action useAction = null)
     {
