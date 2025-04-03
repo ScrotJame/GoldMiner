@@ -110,6 +110,7 @@ public class ScoreControl : MonoBehaviour
     {
         UIManager.instance?.UpdateScoreUI(currentScore);
         UIManager.instance?.UpdateTargetScoreUI(targetScore);
+        UIManager.instance?.UpdateNumber(currentScore); 
         UIManager.instance?.UpdateHighScoreUI(highScore);
     }
 }

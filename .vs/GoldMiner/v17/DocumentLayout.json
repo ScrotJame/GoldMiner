@@ -3,28 +3,12 @@
   "WorkspaceRootPath": "B:\\GoldMiner\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|b:\\goldminer\\assets\\scripts\\uimanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\uimanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\spawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\spawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\pod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|b:\\goldminer\\assets\\scripts\\pod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|b:\\goldminer\\assets\\scripts\\configuration\\dataobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\configuration\\dataobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\objectcollection\\goldbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\objectcollection\\goldbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\uimanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\uimanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\shopcontroll\\storemanger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -35,16 +19,40 @@
       "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\itemmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|b:\\goldminer\\assets\\scripts\\item\\strengitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\item\\strengitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\item\\itemdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\item\\itemdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\shopcontroll\\storeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\shopcontroll\\storeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\item\\blindbox.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\item\\blindbox.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\item\\itemshopdata_ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\item\\itemshopdata_ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\player\\scorepopupmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\player\\scorepopupmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\objectcollection\\goldbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\objectcollection\\goldbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\scorecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\scorecontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\configuration\\dataobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\configuration\\dataobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\shopcontroll\\storeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\shopcontroll\\storeitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\gamecontroll.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -57,10 +65,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\gamedatamanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\gamedatamanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|B:\\GoldMiner\\assets\\scripts\\item\\itemshopdata_ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{34A01208-C021-7459-FCF5-5FA452690081}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\item\\itemshopdata_ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -70,11 +74,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "StoreItem.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\ShopControll\\StoreItem.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ShopControll\\StoreItem.cs",
@@ -87,13 +91,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "Pod.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Pod.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\Pod.cs",
               "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Pod.cs",
               "RelativeToolTip": "Assets\\Scripts\\Pod.cs",
-              "ViewState": "AgIAAIsAAAAAAAAAAAD4v6MAAACCAAAAAAAAAA==",
+              "ViewState": "AgIAACoBAAAAAAAAAAAswEkBAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-11T03:10:18.69Z",
               "IsPinned": true,
@@ -101,13 +105,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "GameManager.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\GameManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameManager.cs",
               "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\GameManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\GameManager.cs",
-              "ViewState": "AgIAALUAAAAAAAAAAAAgwMYAAAAhAAAAAAAAAA==",
+              "ViewState": "AgIAAJUAAAAAAAAAAAA6wKoAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-07T01:59:11.994Z",
               "IsPinned": true,
@@ -121,7 +125,7 @@
               "RelativeDocumentMoniker": "Assets\\Scripts\\UIManager.cs",
               "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\UIManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\UIManager.cs",
-              "ViewState": "AgIAAFsAAAAAAAAAAAAwwB4AAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAAGAAAAAAAAAAAAAEwEQAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-13T09:21:05.451Z",
               "IsPinned": true,
@@ -150,80 +154,90 @@
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Spawner.cs",
-              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Spawner.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\Spawner.cs",
-              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Spawner.cs",
-              "RelativeToolTip": "Assets\\Scripts\\Spawner.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-28T07:37:47.655Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "GoldBase.cs",
-              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
-              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
-              "RelativeToolTip": "Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAADwvwQAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-31T07:10:44.236Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "DataObject.cs",
-              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Configuration\\DataObject.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\Configuration\\DataObject.cs",
-              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Configuration\\DataObject.cs",
-              "RelativeToolTip": "Assets\\Scripts\\Configuration\\DataObject.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAMAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-01T03:16:54.525Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
               "Title": "StoreManger.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\ShopControll\\StoreManger.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ShopControll\\StoreManger.cs",
               "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\ShopControll\\StoreManger.cs",
               "RelativeToolTip": "Assets\\Scripts\\ShopControll\\StoreManger.cs",
-              "ViewState": "AgIAADEAAAAAAAAAAIAwwEYAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAFEAAAAAAAAAAAAIwGYAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-04T07:34:03.506Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 3,
               "Title": "ItemManager.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\ItemManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ItemManager.cs",
               "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\ItemManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\ItemManager.cs",
-              "ViewState": "AgIAAIcAAAAAAAAAAAD4v6YAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAUwMoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-31T08:06:36.794Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "StrengItem.cs",
-              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Item\\StrengItem.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\Item\\StrengItem.cs",
-              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Item\\StrengItem.cs",
-              "RelativeToolTip": "Assets\\Scripts\\Item\\StrengItem.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "ItemData.cs",
+              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Item\\ItemData.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Item\\ItemData.cs",
+              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Item\\ItemData.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Item\\ItemData.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-01T02:51:51.592Z",
+              "WhenOpened": "2025-04-01T09:35:41.794Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "BlindBox.cs",
+              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Item\\BlindBox.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Item\\BlindBox.cs",
+              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Item\\BlindBox.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Item\\BlindBox.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-03T02:27:29.901Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ItemShopData_UI.cs",
+              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Item\\ItemShopData_UI.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Item\\ItemShopData_UI.cs",
+              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Item\\ItemShopData_UI.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Item\\ItemShopData_UI.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-20T07:15:37.587Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ScorePopupManager.cs",
+              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Player\\ScorePopupManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Player\\ScorePopupManager.cs",
+              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Player\\ScorePopupManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Player\\ScorePopupManager.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAtwCYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-01T10:26:32.484Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "GoldBase.cs",
+              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
+              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ObjectCollection\\GoldBase.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAA5wDsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-31T07:10:44.236Z"
             },
             {
               "$type": "Document",
@@ -233,13 +247,25 @@
               "RelativeDocumentMoniker": "Assets\\Scripts\\ScoreControl.cs",
               "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\ScoreControl.cs",
               "RelativeToolTip": "Assets\\Scripts\\ScoreControl.cs",
-              "ViewState": "AgIAADAAAAAAAAAAAAA0wEQAAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAAFUAAAAAAAAAAAA9wFcAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-21T08:42:28.193Z"
+              "WhenOpened": "2025-04-01T10:22:24.164Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 11,
+              "Title": "DataObject.cs",
+              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Configuration\\DataObject.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Configuration\\DataObject.cs",
+              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Configuration\\DataObject.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Configuration\\DataObject.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAMAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-01T03:16:54.525Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
               "Title": "GameControll.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\GameControll.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameControll.cs",
@@ -251,7 +277,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 14,
               "Title": "LinePod.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\LinePod.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\LinePod.cs",
@@ -263,7 +289,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 15,
               "Title": "GameDataManager.cs",
               "DocumentMoniker": "B:\\GoldMiner\\Assets\\GameDataManager.cs",
               "RelativeDocumentMoniker": "Assets\\GameDataManager.cs",
@@ -272,18 +298,6 @@
               "ViewState": "AgIAAAwAAAAAAAAAAAAYwC8AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-28T01:21:58.022Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "ItemShopData_UI.cs",
-              "DocumentMoniker": "B:\\GoldMiner\\Assets\\Scripts\\Item\\ItemShopData_UI.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\Item\\ItemShopData_UI.cs",
-              "ToolTip": "B:\\GoldMiner\\Assets\\Scripts\\Item\\ItemShopData_UI.cs",
-              "RelativeToolTip": "Assets\\Scripts\\Item\\ItemShopData_UI.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T07:15:37.587Z"
             }
           ]
         }

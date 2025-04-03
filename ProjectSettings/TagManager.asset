@@ -7,6 +7,7 @@ TagManager:
   - Gold
   - TNT
   - Hook
+  - BlindBox
   layers:
   - Default
   - TransparentFX

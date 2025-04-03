@@ -22,6 +22,8 @@ public class Pod : MonoBehaviour
     public Vector3 _fistPosition;
     public Transform _transformPostion;
     public int _score, _count;
+    private int dynamiteCount = 0; // Số lượng Dynamite người chơi có
+    private string blindBoxReward; // Lưu phần thưởng từ BlindBox
 
     private Animator _animHook;
     [SerializeField] public float _scrollSpeed = 2.0f;
@@ -154,6 +156,7 @@ public class Pod : MonoBehaviour
                     if (_transformPostion != null && !isUsingDynamite)
                     {
                         GoldBase gold = _transformPostion.GetComponent<GoldBase>();
+                        BlindBox blindBox = _transformPostion.GetComponent<BlindBox>();
                         if (gold != null)
                         {
                             Destroy(_transformPostion.gameObject);
@@ -164,17 +167,36 @@ public class Pod : MonoBehaviour
                             if (Spawner.instance != null && Spawner.instance.IsDrugActive && gold.gameObject.name.Contains("kc_2_0"))
                             {
                                 goldPoints *= 2;
-                                Debug.Log($"Drug tăng giá trị của Diamond lên {goldPoints}");
+                            }
+                            if (Spawner.instance != null && Spawner.instance.IsDrugActive && (gold.gameObject.name.Contains("Stone") || gold.gameObject.name.Contains("Stone2")))
+                            {
+                                goldPoints *= 3;
+                            }
+                            if (gold.gameObject.name.Contains("tui_0"))
+                            {
+                                blindBoxReward = blindBox.GetRewardType();
+                                ApplyBlindBoxReward(blindBoxReward);
+                                Debug.Log($"BLind Box");
                             }
                             _score += goldPoints;
                             _count++;
-
+                            ScorePopupManager.instance?.ShowScorePopup(goldPoints, transform.position);
+                            Debug.Log($"Got: {gold.gameObject.name}: {goldPoints}");
                             if (ScoreControl.instance != null)
                             {
                                 ScoreControl.instance.AddScore(goldPoints);
                             }
                         }
+                        else if (blindBox != null)
+                        {
+                            // Xử lý phần thưởng từ BlindBox khi kéo lên hoàn tất
+                            blindBoxReward = blindBox.GetRewardType();
+                            Destroy(_transformPostion.gameObject);
+                            if (_animHook != null) _animHook.SetBool("got", false);
+                            if (_animMiner != null) _animMiner.Play("MinerRewind");
+                        }
                         _transformPostion = null;
+                        blindBoxReward = null; // Reset phần thưởng sau khi xử lý
                     }
                     _state = StateMoc._rotation;
                     if (_animMiner != null) _animMiner.Play("MinerBaseState");
@@ -185,7 +207,7 @@ public class Pod : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Gold") || collision.gameObject.CompareTag("TNT"))
+        if (collision.gameObject.CompareTag("Gold") || collision.gameObject.CompareTag("TNT") )
         {
             _state = StateMoc._rewind;
             _transformPostion = collision.gameObject.transform;
@@ -197,20 +219,22 @@ public class Pod : MonoBehaviour
             if (_animMiner != null) _animMiner.Play("MinerRoll");
 
             Mouse mouse = collision.gameObject.GetComponent<Mouse>();
-            GoldBase _gold = collision.gameObject.GetComponent<GoldBase>();
+            GoldBase gold = collision.gameObject.GetComponent<GoldBase>();
+            BlindBox blindBox = collision.gameObject.GetComponent<BlindBox>();
 
             if (mouse != null && mouse.RewindObject != null)
             {
                 _slow = mouse.RewindObject.weight;
                 mouse.currentState = GoldState.BeingGrabbed;
             }
-            else if (_gold != null && _gold.RewindObject != null)
+            else if (gold != null && gold.RewindObject != null)
             {
-                _slow = _gold.RewindObject.weight;
+                _slow = gold.RewindObject.weight;
             }
+            
 
             Animator mouseAnim = mouse?.GetComponent<Animator>();
-            Animator goldAnim = _gold?.GetComponent<Animator>();
+            Animator goldAnim = gold?.GetComponent<Animator>();
 
             if (mouseAnim != null || goldAnim != null)
             {
@@ -218,6 +242,58 @@ public class Pod : MonoBehaviour
                 mouseAnim?.SetBool("is_got", true);
                 goldAnim?.SetBool("is_got", true);
             }
+        }
+    }
+    public void SetCollectedObject(Transform obj, string reward = null)
+    {
+        _transformPostion = obj;
+        if (reward != null)
+        {
+            blindBoxReward = reward; 
+        }
+    }
+
+    private void ApplyBlindBoxReward(string reward)
+    {
+        if (string.IsNullOrEmpty(reward)) return;
+
+        switch (reward)
+        {
+            case "Dynamite":
+                AddDynamite();
+                Debug.Log("Nhận được Dynamite từ BlindBox!");
+                break;
+            case "Time":
+                AddTime(10f);
+                Debug.Log("Nhận được Time (+10s) từ BlindBox!");
+                break;
+        }
+    }
+
+
+    public void AddDynamite()
+    {
+        ItemManager.Instance.AddItem("Dynamite", null, () =>
+        {
+            Debug.Log("Dynamite đã được sử dụng");
+        });
+        dynamiteCount++;
+        Debug.Log($"Số lượng Dynamite hiện tại: {dynamiteCount}");
+
+        // Cập nhật UI
+        UIManager.instance?.UpdateDynamiteCount(dynamiteCount);
+    }
+
+
+    public void AddTime(float additionalTime)
+    {
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.AddTime(additionalTime);
+        }
+        else
+        {
+            Debug.LogWarning("Không tìm thấy GameManager để thêm thời gian!");
         }
     }
 
@@ -280,6 +356,7 @@ public class Pod : MonoBehaviour
         }
     }
 
+
     public bool UseStreng()
     {
         if (isStrengthActive)
@@ -309,10 +386,6 @@ public class Pod : MonoBehaviour
             _transformPostion = null;
             if (_animHook != null) _animHook.SetBool("got", false);
             if (_animMiner != null) _animMiner.Play("MinerRewind");
-        }
-        else
-        {
-            return;
         }
     }
 }

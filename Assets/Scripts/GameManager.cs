@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -93,7 +94,13 @@ public class GameManager : MonoBehaviour
 
         StartCountdown();
     }
-
+    private void Start()
+    {
+        if(currentLevel == 1)
+        {
+            ScoreControl.instance?.StartNewGame();
+        }
+    }
     private void StartCountdown()
     {
         if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
@@ -246,7 +253,6 @@ public class GameManager : MonoBehaviour
     {
         if (pod == null || pod.Equals(null))
         {
-        //    pod = FindObjectOfType<Pod>();
             if (pod == null)
             {
                 return;
@@ -285,5 +291,12 @@ public class GameManager : MonoBehaviour
             instance = null;
         }
         StopAllCoroutines();
+    }
+
+    public void AddTime(float additionalTime)
+    {
+        timeLeft += (int)additionalTime; 
+        UIManager.instance?.UpdateTime(timeLeft); 
+        Debug.Log($"Thời gian còn lại sau khi thêm: {timeLeft}");
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,17 +15,20 @@ public class StoreManager : MonoBehaviour
     public Text drugPriceText;
     public Text luckPriceText;
     public Text strengthPriceText;
+    public Text bookPriceText;
     public Sprite owner;
 
     private GameObject itemDynamite;
     private GameObject itemDrug;
     private GameObject itemLuck;
     private GameObject itemStrength;
+    private GameObject itemBook;
 
     private int dynamitePrice = 200; private string dynamiteName = "Dynamite";
-    private int drugPrice = 150; private string drugName = "Drug";
-    private int luckPrice = 100; private string luckName = "Luck";
-    private int strengthPrice = 120; private string strengName = "Streng";
+    private int drugPrice = 550; private string drugName = "Drug";
+    private int luckPrice = 950; private string luckName = "Luck";
+    private int strengthPrice = 350; private string strengName = "Streng";
+    private int bookPrice = 350; private string bookName = "Book Rock";
 
     public float hookSpeed = 1f;
     public int upPriceDia = 10;
@@ -35,6 +39,7 @@ public class StoreManager : MonoBehaviour
     private Button drugButton;
     private Button luckButton;
     private Button strengthButton;
+    private Button bookButton;
     private Button continueButton;
 
     [SerializeField] private Sprite dynamiteSprite;
@@ -69,7 +74,10 @@ public class StoreManager : MonoBehaviour
     {
         if (ScoreControl.instance.SpendScore(luckPrice))
         {
-            Spawner.instance.ApplyLuckBoost();
+            ItemManager.Instance.AddItem("Luck", null, () =>
+            {
+                Spawner.instance.ApplyLuckBoost();
+            });
             Destroy(itemLuck);
             itemLuck = null;
             UpdateUI();
@@ -83,9 +91,16 @@ public class StoreManager : MonoBehaviour
     {
         if (ScoreControl.instance.SpendScore(dynamitePrice))
         {
-            dynamitePower += 0.5f;
-            Debug.Log("Đã mua Dynamite! Sức mạnh: " + dynamitePower);
-            Spawner.instance.ApplyDrugEffect();
+            ItemManager.Instance.AddItem("Dynamite", dynamiteSprite, () =>
+            {
+                Debug.Log("Dynamite added to inventory");
+            });
+
+            int dynamiteCount = ItemManager.Instance.GetItemCount("Dynamite");
+            if (UIManager.instance != null)
+            {
+                UIManager.instance.UpdateDynamiteCount(dynamiteCount);
+            }
             Destroy(itemDynamite);
             itemDynamite = null;
             UpdateUI();
@@ -95,7 +110,6 @@ public class StoreManager : MonoBehaviour
             Debug.Log("Không đủ vàng để mua Dynamite!");
         }
     }
-
     public void BuyDrug()
     {
         if (ScoreControl.instance.SpendScore(drugPrice))
@@ -115,18 +129,30 @@ public class StoreManager : MonoBehaviour
             Debug.Log("Không đủ vàng để mua Drug!");
         }
     }
-
     public void BuyStreng()
     {
         if (ScoreControl.instance.SpendScore(strengthPrice))
         {
-            Debug.Log("Đã mua Strength!");
             ItemManager.Instance.AddItem("Streng", null, () =>
             {
                 Debug.Log("Strength đã được sử dụng");
             });
             Destroy(itemStrength);
             itemStrength = null;
+            UpdateUI();
+        }
+    }
+    private void BuyBook()
+    {
+        if(ScoreControl.instance.SpendScore(bookPrice))
+        {
+            Debug.Log("Đã mua Book!");
+            ItemManager.Instance.AddItem("Book", owner, () =>
+            {
+                Spawner.instance.ApplyBookEffect();
+            });
+            Destroy(itemBook);
+            itemBook = null;
             UpdateUI();
         }
     }
@@ -152,21 +178,25 @@ public class StoreManager : MonoBehaviour
             drugPriceText = shopInstance.transform.Find("ShopUIPanel/ItemDrug/Price").GetComponent<Text>();
             luckPriceText = shopInstance.transform.Find("ShopUIPanel/ItemLuck/Price").GetComponent<Text>();
             strengthPriceText = shopInstance.transform.Find("ShopUIPanel/ItemStreng/Price").GetComponent<Text>();
+            bookPriceText = shopInstance.transform.Find("ShopUIPanel/ItemBook/Price").GetComponent<Text>();
 
             Text dynamiteNameText = shopInstance.transform.Find("ShopUIPanel/ItemDynamite/Name").GetComponent<Text>();
             Text drugNameText = shopInstance.transform.Find("ShopUIPanel/ItemDrug/Name").GetComponent<Text>();
             Text luckNameText = shopInstance.transform.Find("ShopUIPanel/ItemLuck/Name").GetComponent<Text>();
             Text strengthNameText = shopInstance.transform.Find("ShopUIPanel/ItemStreng/Name").GetComponent<Text>();
+            Text bookNameText = shopInstance.transform.Find("ShopUIPanel/ItemBook/Name").GetComponent<Text>();
 
             dynamiteNameText.text = dynamiteName;
             drugNameText.text = drugName;
             luckNameText.text = luckName;
             strengthNameText.text = strengName;
+            bookNameText.text = bookName;
 
             itemDynamite = shopInstance.transform.Find("ShopUIPanel/ItemDynamite").gameObject;
             itemDrug = shopInstance.transform.Find("ShopUIPanel/ItemDrug").gameObject;
             itemLuck = shopInstance.transform.Find("ShopUIPanel/ItemLuck").gameObject;
             itemStrength = shopInstance.transform.Find("ShopUIPanel/ItemStreng").gameObject;
+            itemBook = shopInstance.transform.Find("ShopUIPanel/ItemBook").gameObject;
 
             dynamiteButton = shopInstance.transform.Find("ShopUIPanel/ItemDynamite").GetComponentInChildren<Button>();
             dynamiteButton.onClick.AddListener(BuyDynamite);
@@ -179,6 +209,9 @@ public class StoreManager : MonoBehaviour
 
             strengthButton = shopInstance.transform.Find("ShopUIPanel/ItemStreng").GetComponentInChildren<Button>();
             strengthButton.onClick.AddListener(BuyStreng);
+
+            bookButton = shopInstance.transform.Find("ShopUIPanel/ItemBook").GetComponentInChildren<Button>();
+            bookButton.onClick.AddListener(BuyBook);
 
             continueButton = shopInstance.transform.Find("ShopUIPanel/Continue").GetComponent<Button>();
             if (continueButton != null)
@@ -200,22 +233,26 @@ public class StoreManager : MonoBehaviour
             if (luckButton != null) luckButton.onClick.RemoveAllListeners();
             if (strengthButton != null) strengthButton.onClick.RemoveAllListeners();
             if (continueButton != null) continueButton.onClick.RemoveAllListeners();
+            if(bookButton != null) bookButton.onClick.RemoveAllListeners();
 
             dynamiteButton = null;
             drugButton = null;
             luckButton = null;
             strengthButton = null;
+            bookButton = null;
             continueButton = null;
 
             scoreText = null;
             dynamitePriceText = null;
             drugPriceText = null;
             luckPriceText = null;
+            bookPriceText = null;
             strengthPriceText = null;
 
             itemDynamite = null;
             itemDrug = null;
             itemLuck = null;
+            itemBook = null;
             itemStrength = null;
 
             Destroy(shopInstance);
@@ -243,6 +280,7 @@ public class StoreManager : MonoBehaviour
         if (itemDrug != null) drugPriceText.text = drugPrice + " Vàng";
         if (itemLuck != null) luckPriceText.text = luckPrice + " Vàng";
         if (itemStrength != null) strengthPriceText.text = strengthPrice + " Vàng";
+        if (itemBook != null) bookPriceText.text = bookPrice + " Vàng";  
     }
 
     void OnDestroy()

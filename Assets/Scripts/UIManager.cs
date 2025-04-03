@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     public Text scoreText;
     public Text targetScoreText;
     public Text highScoreText;
+    public Text dynamiteText;
 
     // UI Notification
     public GameObject gameNotificationPanel;
@@ -22,6 +23,10 @@ public class UIManager : MonoBehaviour
     public GameObject storePanel;
     public Text missionTargetText;
     private Coroutine missionPanelCoroutine;
+
+    // Score popup
+    public GameObject scorePopupPrefab;
+    public Transform popupParent;
 
     private void Awake()
     {
@@ -35,6 +40,7 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
 
@@ -65,10 +71,19 @@ public class UIManager : MonoBehaviour
         {
             gameObject.SetActive(true);
             timeText = GameObject.Find("Time")?.GetComponent<Text>();
-            numberText = GameObject.Find("SL")?.GetComponent<Text>();
+            dynamiteText = GameObject.Find("CountDynamite")?.GetComponent<Text>();
+            if (dynamiteText != null && string.IsNullOrEmpty(dynamiteText.text))
+            {
+                dynamiteText.gameObject.SetActive(!string.IsNullOrEmpty(dynamiteText.text) && int.Parse(dynamiteText.text) > 0);
+            }
+            else
+            {
+                dynamiteText.gameObject.SetActive(false);
+            }
             scoreText = GameObject.Find("Score")?.GetComponent<Text>();
             targetScoreText = GameObject.Find("target")?.GetComponent<Text>();
             notificationText = GameObject.Find("NotiText")?.GetComponent<Text>();
+            highScoreText = GameObject.Find("SL")?.GetComponent<Text>();
             gameNotificationPanel = GameObject.Find("Notifice");
             menuGamePanel = GameObject.Find("MenuPause");
             missionPanel = GameObject.Find("NotifMission");
@@ -97,6 +112,14 @@ public class UIManager : MonoBehaviour
         {
             notificationText.text = message;
             gameNotificationPanel?.SetActive(true);
+        }
+    }
+    public void UpdateDynamiteCount(int count)
+    {
+        if (dynamiteText != null)
+        {
+            dynamiteText.text = count.ToString();
+            dynamiteText.gameObject.SetActive(count > 0);
         }
     }
 
@@ -144,6 +167,6 @@ public class UIManager : MonoBehaviour
     public void UpdateHighScoreUI(int highScore)
     {
         if (highScoreText != null)
-            highScoreText.text = "High Score: " + highScore;
+            highScoreText.text = "" + highScore;
     }
 }

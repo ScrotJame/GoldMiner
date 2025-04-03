@@ -18,7 +18,9 @@ public class Spawner : MonoBehaviour
     }
     private bool isLuckActive ;
     private float diamondLuckBoost = 2.25f;
+
     private bool applyLuckToNextLevel = false;
+    private bool applyBookToNextLevel = false;
     private bool applyDrugtoNextLevel = false;
     [SerializeField] private SpawnableObject[] spawnableObjects; 
     [SerializeField] private int maxAttempts = 1000000000;          
@@ -28,6 +30,7 @@ public class Spawner : MonoBehaviour
 
     private HashSet<Vector2> usedPositions = new HashSet<Vector2>();
     private bool isDrugActive;
+    private bool isBookActive;
 
     private void Awake()
     {
@@ -51,8 +54,6 @@ public class Spawner : MonoBehaviour
     {
         usedPositions.Clear();
         int currentLevel = GameManager.instance != null ? GameManager.instance.currentLevel : 1;
-        Debug.Log("Luck Active: " + isLuckActive);
-
         foreach (var spawnable in spawnableObjects)
         {
             int itemsToSpawn = Random.Range(spawnable.minCount, spawnable.maxCount + 1);
@@ -60,7 +61,6 @@ public class Spawner : MonoBehaviour
             if (isLuckActive && spawnable.prefab.name == "kc_2_0")
             {
                 spawnChance *= diamondLuckBoost;  
-                Debug.Log($"Luck Active! Tăng tỷ lệ xuất hiện {spawnable.prefab.name} lên {spawnChance}");
             }
 
             for (int i = 0; i < itemsToSpawn; i++)
@@ -122,32 +122,40 @@ public class Spawner : MonoBehaviour
                 Destroy(obj);
             }
         }
-        if (applyLuckToNextLevel || applyDrugtoNextLevel)
+        if (applyLuckToNextLevel || applyDrugtoNextLevel )
         {
             isLuckActive = true;
             isDrugActive = true;
+
             applyLuckToNextLevel = false;
             applyDrugtoNextLevel = false;
-            Debug.Log("Applying luck boost to this level");
         }
         else
         {
             isLuckActive = false;
             isDrugActive = false;
         }
+        if (applyBookToNextLevel)
+        {
+            isBookActive = true;
+            applyBookToNextLevel = false;
+        }
+        else        { isBookActive = false; }
         usedPositions.Clear();
         SpawnObjects();
     }
     public void ApplyLuckBoost()
     {
-        applyLuckToNextLevel = true;
-        Debug.Log("Luck will be applied to the next level");
+        applyBookToNextLevel = true;
     }
 
     public void ApplyDrugEffect()
     {
         applyDrugtoNextLevel=true;
-        Debug.Log("Drug đã được kích hoạt! Tăng giá trị vật phẩm thu thập được.");
+    }
+    public void ApplyBookEffect()
+    {
+        applyBookToNextLevel = true;
     }
     public bool IsDrugActive
     {

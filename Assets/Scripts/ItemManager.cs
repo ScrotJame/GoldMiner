@@ -1,5 +1,4 @@
-﻿// File: ItemManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -7,11 +6,11 @@ public class ItemManager : MonoBehaviour
 {
     public static ItemManager Instance;
 
-    [SerializeField] private GameObject[] itemsUIPrefab; 
-    [SerializeField] private Transform itemsContainer;  
+    [SerializeField] private GameObject[] itemsUIPrefab;
+    [SerializeField] private Transform itemsContainer;
 
-    private List<ItemData> ownedItems = new List<ItemData>(); 
-    private Dictionary<string, GameObject> itemButtons = new Dictionary<string, GameObject>(); 
+    private List<ItemData> ownedItems = new List<ItemData>();
+    private Dictionary<string, GameObject> itemButtons = new Dictionary<string, GameObject>();
 
     private bool isHaveItems = false;
     private void Awake()
@@ -58,6 +57,13 @@ public class ItemManager : MonoBehaviour
                 ownedItems.Add(item);
             }
             ShowItemButton(item);
+
+            // Update UI Manager when dynamite is added from any source
+            if (itemName == "Dynamite" && UIManager.instance != null)
+            {
+                int dynamiteCount = item.quantity;
+                UIManager.instance.UpdateDynamiteCount(dynamiteCount);
+            }
         }
         else
         {
@@ -70,7 +76,7 @@ public class ItemManager : MonoBehaviour
         GameObject prefab = null;
         foreach (var p in itemsUIPrefab)
         {
-            if (p.name == item.itemName + "Use") 
+            if (p.name == item.itemName + "Use")
             {
                 prefab = p;
                 break;
@@ -116,9 +122,9 @@ public class ItemManager : MonoBehaviour
         Text quantityText = buttonObj.transform.Find("QuantityText")?.GetComponent<Text>();
         if (quantityText != null) quantityText.text = "x" + item.quantity;
     }
+
     public void ClearAllItems()
     {
-        
         foreach (var button in itemButtons.Values)
         {
             Destroy(button);
@@ -126,29 +132,46 @@ public class ItemManager : MonoBehaviour
         itemButtons.Clear();
         ownedItems.Clear();
     }
+
     public void UseItem(string itemName)
     {
         ItemData item = ownedItems.Find(i => i.itemName == itemName);
         if (item != null && item.quantity > 0)
         {
             bool useSuccess = false;
+
+            // Execute the item action separately from consumption logic
             if (item.onUse != null)
             {
-                var previousQuantity = item.quantity;
                 item.onUse.Invoke();
-                if (item.itemName == "Dynamite")
-                {
-                    useSuccess = Pod.instance.UseDynamite();
-                }
-                else if (item.itemName == "Streng")
-                {
-                    useSuccess = true;
-                    Pod.instance.UseStreng();
-                }
             }
+
+            // Handle specific item types consistently
+            if (item.itemName == "Dynamite")
+            {
+                useSuccess = Pod.instance.UseDynamite();
+            }
+            else if (item.itemName == "Streng")
+            {
+                useSuccess = true;
+                Pod.instance.UseStreng();
+            }
+            else
+            {
+                // For other items, assume success
+                useSuccess = true;
+            }
+
             if (useSuccess)
             {
                 item.quantity--;
+
+                // Update UI Manager for dynamite
+                if (item.itemName == "Dynamite" && UIManager.instance != null)
+                {
+                    UIManager.instance.UpdateDynamiteCount(item.quantity);
+                }
+
                 if (item.quantity <= 0)
                 {
                     ownedItems.Remove(item);
@@ -164,6 +187,13 @@ public class ItemManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    // Helper method to check dynamite count
+    public int GetItemCount(string itemName)
+    {
+        ItemData item = ownedItems.Find(i => i.itemName == itemName);
+        return item != null ? item.quantity : 0;
     }
 
     private void OnDestroy()
