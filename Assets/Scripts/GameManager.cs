@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     public int currentLevel = 1;
     public int goldAmount = 0;
 
-    private int initialTime = 20;
+    private int initialTime = 5;
     private int timeLeft;
     private int pendingScore;
     private bool shouldStartNextMission = false;
@@ -225,7 +225,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void HomeButton() => SceneManager.LoadScene("MainMenu");
-    public void PlayAgainButton() { ScoreControl.instance?.StartNewGame(); SceneManager.LoadScene("GamePlay"); UIManager.instance.HidePanels(); }
+    public void PlayAgainButton() { ScoreControl.instance?.PlayAgainGame(); SceneManager.LoadScene("GamePlay"); UIManager.instance.HidePanels(); }
     public void PlayButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
     public void ContinueButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
     public void StopButton() { Time.timeScale = 0; UIManager.instance?.menuGamePanel?.SetActive(true); StopCountdown(); }
@@ -297,6 +297,5 @@ public class GameManager : MonoBehaviour
     {
         timeLeft += (int)additionalTime; 
         UIManager.instance?.UpdateTime(timeLeft); 
-        Debug.Log($"Thời gian còn lại sau khi thêm: {timeLeft}");
     }
 }

@@ -73,11 +73,6 @@ public class Spawner : MonoBehaviour
                         GameObject spawnedObject = Instantiate(spawnable.prefab, spawnPoint, Quaternion.identity);
                         spawnedObject.name = spawnable.prefab.name;
                         usedPositions.Add(spawnPoint);
-
-                        if (spawnable.prefab.name == "kc_2_0")
-                        {
-                            Debug.Log($"Spawned {spawnedObject.name} at {spawnPoint} with adjusted chance: {spawnChance}");
-                        }
                     }
                 
             }

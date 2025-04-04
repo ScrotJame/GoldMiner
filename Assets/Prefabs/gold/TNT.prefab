@@ -135,6 +135,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   explosionEffect: {fileID: 0}
+  shockwavePrefab: {fileID: 0}
 --- !u!50 &2873731011961193551
 Rigidbody2D:
   serializedVersion: 5

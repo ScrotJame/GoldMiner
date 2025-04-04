@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class GoldBase : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class GoldBase : MonoBehaviour
 
     private Rigidbody2D rb2D;
     private Animator _animator;
+    private object animator;
 
     private void Awake()
     {
@@ -51,16 +53,30 @@ public class GoldBase : MonoBehaviour
 
         if (health <= 0)
         {
-            DestroyObject();
+            StartCoroutine(DestroyWithAnimation());
         }
     }
-    void DestroyObject()
+    public void PlayFlameAnimation()
     {
+        if (_animator != null)
+        {
+            _animator.Play("flame_anim");
+        }
+    }
+    public IEnumerator PlayFlameAnimationWithDelay()
+    {
+        yield return new WaitForSeconds(0.75f); 
+        PlayFlameAnimation();
+    }
+    private IEnumerator DestroyWithAnimation()
+    {
+        PlayFlameAnimation();
+        yield return new WaitForSeconds(0.45f);
+
         if (destroyEffect != null)
         {
             Instantiate(destroyEffect, transform.position, Quaternion.identity);
         }
-
         Destroy(gameObject);
     }
 }

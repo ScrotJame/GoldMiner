@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6c8e4ea4970444644a29c65179a5acb2
+guid: f7305fa371755104c8f14cb5eda28d10
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 403208247147482157
-    second: Flame_0
+      213: 4532868720504515668
+    second: ShockWaveBoom_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,45 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Flame_0
+      name: ShockWaveBoom_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 128
-        height: 128
+        x: 13
+        y: 12
+        width: 230
+        height: 234
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
-      outline:
-      - - {x: -34, y: 14}
-        - {x: -38, y: 3}
-        - {x: -32, y: -16}
-        - {x: -37, y: -22}
-        - {x: -33, y: -31}
-        - {x: -5, y: -47}
-        - {x: 2, y: -39}
-        - {x: 16, y: -35}
-        - {x: 32, y: -39}
-        - {x: 38, y: -32}
-        - {x: 34, y: -14}
-        - {x: 23, y: -6}
-        - {x: 33, y: -2}
-        - {x: 32, y: 8}
-        - {x: 39, y: 9}
-        - {x: 42, y: 19}
-        - {x: 39, y: 29}
-        - {x: 21, y: 33}
-        - {x: 6, y: 40}
-        - {x: -18, y: 33}
-        - {x: -25, y: 25}
-        - {x: -36, y: 27}
+      outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: d2ccbb5b3cb789500800000000000000
-      internalID: 403208247147482157
+      spriteID: 45ca62bc51cf7ee30800000000000000
+      internalID: 4532868720504515668
       vertices: []
       indices: 
       edges: []
@@ -160,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 8d85ebb102db93d43aeae9b6488d41f0
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -169,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Flame_0: 403208247147482157
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

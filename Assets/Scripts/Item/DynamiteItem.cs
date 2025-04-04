@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class DynamiteItem : MonoBehaviour
 {
@@ -45,13 +46,29 @@ public class DynamiteItem : MonoBehaviour
     {
         if (targetItem != null && collision.transform == targetItem)
         {
-            Destroy(collision.gameObject);
+            GoldBase gold = collision.gameObject.GetComponent<GoldBase>();
+            Animator goldAnim = gold?.GetComponent<Animator>();
+
             if (audioSource != null && explosionClip != null)
             {
                 audioSource.PlayOneShot(explosionClip);
             }
-            pod.OnDynamiteFinished(true); 
-            Destroy(gameObject);
+
+            if (goldAnim != null)
+            {
+                goldAnim.Play("flame_anim");
+            }
+            StartCoroutine(CheckAndDestroyAfterAnimation(goldAnim, collision.gameObject));
+            pod.OnDynamiteFinished(true);
         }
     }
+
+    IEnumerator CheckAndDestroyAfterAnimation(Animator anim, GameObject obj)
+    {
+        float animationLength = anim.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(animationLength);
+
+        Destroy(obj);
+    }
+
 }

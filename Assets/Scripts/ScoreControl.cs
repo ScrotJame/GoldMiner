@@ -74,11 +74,23 @@ public class ScoreControl : MonoBehaviour
         UpdateUI();
     }
 
+    public void PlayAgainGame()
+    {
+        CheckAndSaveHighScore();
+        ResetScore();
+        SaveData();
+        if (UIManager.instance != null)
+        {
+            Destroy(UIManager.instance.gameObject);
+        }
+        SceneManager.LoadScene("GamePlay"); 
+    }
+
     public void ResetScore()
     {
         currentScore = 0;
         targetScore = 650;
-        initialTime =20;
+        initialTime = 20;
         SaveData();
         UpdateUI();
     }
@@ -110,7 +122,7 @@ public class ScoreControl : MonoBehaviour
     {
         UIManager.instance?.UpdateScoreUI(currentScore);
         UIManager.instance?.UpdateTargetScoreUI(targetScore);
-        UIManager.instance?.UpdateNumber(currentScore); 
+        UIManager.instance?.UpdateNumber(currentScore);
         UIManager.instance?.UpdateHighScoreUI(highScore);
     }
 }

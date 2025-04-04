@@ -22,8 +22,8 @@ public class Pod : MonoBehaviour
     public Vector3 _fistPosition;
     public Transform _transformPostion;
     public int _score, _count;
-    private int dynamiteCount = 0; // Số lượng Dynamite người chơi có
-    private string blindBoxReward; // Lưu phần thưởng từ BlindBox
+    private int dynamiteCount = 0; 
+    private string blindBoxReward;
 
     private Animator _animHook;
     [SerializeField] public float _scrollSpeed = 2.0f;
@@ -181,7 +181,6 @@ public class Pod : MonoBehaviour
                             _score += goldPoints;
                             _count++;
                             ScorePopupManager.instance?.ShowScorePopup(goldPoints, transform.position);
-                            Debug.Log($"Got: {gold.gameObject.name}: {goldPoints}");
                             if (ScoreControl.instance != null)
                             {
                                 ScoreControl.instance.AddScore(goldPoints);
@@ -189,14 +188,13 @@ public class Pod : MonoBehaviour
                         }
                         else if (blindBox != null)
                         {
-                            // Xử lý phần thưởng từ BlindBox khi kéo lên hoàn tất
                             blindBoxReward = blindBox.GetRewardType();
                             Destroy(_transformPostion.gameObject);
                             if (_animHook != null) _animHook.SetBool("got", false);
                             if (_animMiner != null) _animMiner.Play("MinerRewind");
                         }
                         _transformPostion = null;
-                        blindBoxReward = null; // Reset phần thưởng sau khi xử lý
+                        blindBoxReward = null; 
                     }
                     _state = StateMoc._rotation;
                     if (_animMiner != null) _animMiner.Play("MinerBaseState");
@@ -280,7 +278,6 @@ public class Pod : MonoBehaviour
         dynamiteCount++;
         Debug.Log($"Số lượng Dynamite hiện tại: {dynamiteCount}");
 
-        // Cập nhật UI
         UIManager.instance?.UpdateDynamiteCount(dynamiteCount);
     }
 

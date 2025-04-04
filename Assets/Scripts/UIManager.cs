@@ -28,58 +28,81 @@ public class UIManager : MonoBehaviour
     public GameObject scorePopupPrefab;
     public Transform popupParent;
 
+    private Canvas uiCanvas;
+
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Tạo Canvas mới
+            SetupCanvas();
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
     }
 
+    private void SetupCanvas()
+    {
+        // Xóa Canvas cũ nếu có
+        if (uiCanvas != null)
+        {
+            Destroy(uiCanvas);
+        }
+
+        // Tạo Canvas mới
+        uiCanvas = gameObject.GetComponent<Canvas>();
+        if (uiCanvas == null)
+        {
+            uiCanvas = gameObject.AddComponent<Canvas>();
+        }
+        uiCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+        uiCanvas.worldCamera = Camera.main; // Gán Main Camera
+        if (uiCanvas.worldCamera == null)
+        {
+            Debug.LogWarning("Không tìm thấy Main Camera khi tạo Canvas!");
+        }
+    }
+
+    void Start()
+    {
+        InitializeButtons();
+    }
+
+    void InitializeButtons()
+    {
+        if (gameNotificationPanel != null)
+        {
+            Button[] buttons = gameNotificationPanel.GetComponentsInChildren<Button>();
+            foreach (Button btn in buttons)
+            {
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => HandleButtonClick(btn.name));
+                btn.interactable = true;
+            }
+        }
+    }
+
+    void HandleButtonClick(string buttonName)
+    {
+        Debug.Log("Nút được nhấn: " + buttonName);
+    }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        if (missionPanelCoroutine != null)
-        {
-            StopCoroutine(missionPanelCoroutine);
-            missionPanelCoroutine = null;
-        }
-    }
-    void OnDestroy()
-    {
-        if (instance == this)
-        {
-            instance = null;
-        }
-        if (missionPanelCoroutine != null)
-        {
-            StopCoroutine(missionPanelCoroutine);
-            missionPanelCoroutine = null;
-        }
-    }
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "GamePlay")
         {
-            gameObject.SetActive(true);
+            SetupCanvas();
             timeText = GameObject.Find("Time")?.GetComponent<Text>();
             dynamiteText = GameObject.Find("CountDynamite")?.GetComponent<Text>();
-            if (dynamiteText != null && string.IsNullOrEmpty(dynamiteText.text))
-            {
-                dynamiteText.gameObject.SetActive(!string.IsNullOrEmpty(dynamiteText.text) && int.Parse(dynamiteText.text) > 0);
-            }
-            else
-            {
-                dynamiteText.gameObject.SetActive(false);
-            }
             scoreText = GameObject.Find("Score")?.GetComponent<Text>();
             targetScoreText = GameObject.Find("target")?.GetComponent<Text>();
             notificationText = GameObject.Find("NotiText")?.GetComponent<Text>();
@@ -87,7 +110,26 @@ public class UIManager : MonoBehaviour
             gameNotificationPanel = GameObject.Find("Notifice");
             menuGamePanel = GameObject.Find("MenuPause");
             missionPanel = GameObject.Find("NotifMission");
-            missionTargetText = GameObject.Find("MissiontargetText")?.GetComponentInChildren<Text>();
+            missionTargetText = GameObject.Find("MissiontargetText")?.GetComponent<Text>();
+            UIManager[] uiManagers = FindObjectsOfType<UIManager>();
+            if (uiManagers.Length > 1)
+            {
+                for (int i = 1; i < uiManagers.Length; i++)
+                {
+                    Destroy(uiManagers[i].gameObject);
+                }
+            }
+            InitializeButtons();
+            if (gameNotificationPanel != null)
+            {
+                gameNotificationPanel.SetActive(true);
+                Canvas panelCanvas = gameNotificationPanel.GetComponent<Canvas>();
+                if (panelCanvas != null)
+                {
+                    panelCanvas.sortingOrder = 10;
+                }
+            }
+
             if (missionPanel != null)
             {
                 missionPanel.SetActive(true);
@@ -111,9 +153,14 @@ public class UIManager : MonoBehaviour
         if (notificationText != null)
         {
             notificationText.text = message;
-            gameNotificationPanel?.SetActive(true);
+            if (gameNotificationPanel != null)
+            {
+                gameNotificationPanel.SetActive(true);
+                InitializeButtons();
+            }
         }
     }
+
     public void UpdateDynamiteCount(int count)
     {
         if (dynamiteText != null)
@@ -141,32 +188,29 @@ public class UIManager : MonoBehaviour
     private IEnumerator HideMissionPanelAfterDelay(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
-        missionPanel?.SetActive(false);
+        if (missionPanel != null) missionPanel.SetActive(false);
         missionPanelCoroutine = null;
     }
 
     public void HidePanels()
     {
-        menuGamePanel?.SetActive(false);
-        gameNotificationPanel?.SetActive(false);
-        missionPanel?.SetActive(false);
+        if (menuGamePanel != null) menuGamePanel.SetActive(false);
+        if (gameNotificationPanel != null) gameNotificationPanel.SetActive(false);
+        if (missionPanel != null) missionPanel.SetActive(false);
     }
 
     public void UpdateScoreUI(int score)
     {
-        if (scoreText != null)
-            scoreText.text = "" + score;
+        if (scoreText != null) scoreText.text = "" + score;
     }
 
     public void UpdateTargetScoreUI(int targetScore)
     {
-        if (targetScoreText != null)
-            targetScoreText.text = " " + targetScore;
+        if (targetScoreText != null) targetScoreText.text = " " + targetScore;
     }
 
     public void UpdateHighScoreUI(int highScore)
     {
-        if (highScoreText != null)
-            highScoreText.text = "" + highScore;
+        if (highScoreText != null) highScoreText.text = "" + highScore;
     }
 }
