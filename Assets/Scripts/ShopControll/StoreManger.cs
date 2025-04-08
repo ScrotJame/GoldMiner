@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,6 +45,15 @@ public class StoreManager : MonoBehaviour
 
     [SerializeField] private Sprite dynamiteSprite;
 
+    private Dictionary<string, int> itemPurchaseLevel = new Dictionary<string, int>
+    {
+        { "Dynamite", -2 },
+        { "Drug", -2 },
+        { "Luck", -2 },
+        { "Streng", -2 },
+        { "Book", -2 }
+    };
+
     void Awake()
     {
         if (Instance == null)
@@ -70,8 +80,21 @@ public class StoreManager : MonoBehaviour
         }
     }
 
+    private bool CanBuyItem(string itemName)
+    {
+        int currentLevel = GameManager.instance != null ? GameManager.instance.currentLevel : 1; 
+        int lastPurchaseLevel = itemPurchaseLevel[itemName];
+        return lastPurchaseLevel == -2 || (currentLevel >= lastPurchaseLevel + 2);
+    }
+
     public void BuyLuck()
     {
+        if (!CanBuyItem("Luck"))
+        {
+            Debug.Log($"Luck chỉ có thể mua lại ở màn {itemPurchaseLevel["Luck"] + 2} trở đi!");
+            return;
+        }
+
         if (ScoreControl.instance.SpendScore(luckPrice))
         {
             ItemManager.Instance.AddItem("Luck", null, () =>
@@ -80,6 +103,8 @@ public class StoreManager : MonoBehaviour
             });
             Destroy(itemLuck);
             itemLuck = null;
+            itemPurchaseLevel["Luck"] = GameManager.instance.currentLevel; 
+            luckButton.interactable = false;
             UpdateUI();
         }
         else
@@ -87,10 +112,18 @@ public class StoreManager : MonoBehaviour
             Debug.Log("Không đủ vàng để mua Luck!");
         }
     }
+
     public void BuyDynamite()
     {
+        if (!CanBuyItem("Dynamite"))
+        {
+            Debug.Log($"Dynamite chỉ có thể mua lại ở màn {itemPurchaseLevel["Dynamite"] + 2} trở đi!");
+            return;
+        }
+
         if (ScoreControl.instance.SpendScore(dynamitePrice))
         {
+            Debug.Log("Đã mua Dynamite!");
             ItemManager.Instance.AddItem("Dynamite", dynamiteSprite, () =>
             {
                 Debug.Log("Dynamite added to inventory");
@@ -103,6 +136,8 @@ public class StoreManager : MonoBehaviour
             }
             Destroy(itemDynamite);
             itemDynamite = null;
+            itemPurchaseLevel["Dynamite"] = GameManager.instance.currentLevel; 
+            dynamiteButton.interactable = false;
             UpdateUI();
         }
         else
@@ -110,8 +145,15 @@ public class StoreManager : MonoBehaviour
             Debug.Log("Không đủ vàng để mua Dynamite!");
         }
     }
+
     public void BuyDrug()
     {
+        if (!CanBuyItem("Drug"))
+        {
+            Debug.Log($"Drug chỉ có thể mua lại ở màn {itemPurchaseLevel["Drug"] + 2} trở đi!");
+            return;
+        }
+
         if (ScoreControl.instance.SpendScore(drugPrice))
         {
             Debug.Log("Đã mua Drug!");
@@ -122,6 +164,8 @@ public class StoreManager : MonoBehaviour
             });
             Destroy(itemDrug);
             itemDrug = null;
+            itemPurchaseLevel["Drug"] = GameManager.instance.currentLevel; 
+            drugButton.interactable = false;
             UpdateUI();
         }
         else
@@ -129,8 +173,15 @@ public class StoreManager : MonoBehaviour
             Debug.Log("Không đủ vàng để mua Drug!");
         }
     }
+
     public void BuyStreng()
     {
+        if (!CanBuyItem("Streng"))
+        {
+            Debug.Log($"Strength chỉ có thể mua lại ở màn {itemPurchaseLevel["Streng"] + 2} trở đi!");
+            return;
+        }
+
         if (ScoreControl.instance.SpendScore(strengthPrice))
         {
             ItemManager.Instance.AddItem("Streng", null, () =>
@@ -139,12 +190,21 @@ public class StoreManager : MonoBehaviour
             });
             Destroy(itemStrength);
             itemStrength = null;
+            itemPurchaseLevel["Streng"] = GameManager.instance.currentLevel; 
+            strengthButton.interactable = false;
             UpdateUI();
         }
     }
+
     private void BuyBook()
     {
-        if(ScoreControl.instance.SpendScore(bookPrice))
+        if (!CanBuyItem("Book"))
+        {
+            Debug.Log($"Book chỉ có thể mua lại ở màn {itemPurchaseLevel["Book"] + 2} trở đi!");
+            return;
+        }
+
+        if (ScoreControl.instance.SpendScore(bookPrice))
         {
             Debug.Log("Đã mua Book!");
             ItemManager.Instance.AddItem("Book", owner, () =>
@@ -153,6 +213,8 @@ public class StoreManager : MonoBehaviour
             });
             Destroy(itemBook);
             itemBook = null;
+            itemPurchaseLevel["Book"] = GameManager.instance.currentLevel; 
+            bookButton.interactable = false;
             UpdateUI();
         }
     }
@@ -164,7 +226,7 @@ public class StoreManager : MonoBehaviour
         if (mainCanvas == null || mainCanvas.Equals(null))
         {
             mainCanvas = FindObjectOfType<Canvas>();
-            if (mainCanvas == null)   {    return;            }
+            if (mainCanvas == null) { return; }
         }
 
         if (shopInstance == null)
@@ -218,6 +280,8 @@ public class StoreManager : MonoBehaviour
             {
                 continueButton.onClick.AddListener(HideShop);
             }
+
+            UpdateButtonStates();
         }
         shopInstance.SetActive(true);
         UpdateUI();
@@ -227,13 +291,12 @@ public class StoreManager : MonoBehaviour
     {
         if (shopInstance != null)
         {
-
             if (dynamiteButton != null) dynamiteButton.onClick.RemoveAllListeners();
             if (drugButton != null) drugButton.onClick.RemoveAllListeners();
             if (luckButton != null) luckButton.onClick.RemoveAllListeners();
             if (strengthButton != null) strengthButton.onClick.RemoveAllListeners();
             if (continueButton != null) continueButton.onClick.RemoveAllListeners();
-            if(bookButton != null) bookButton.onClick.RemoveAllListeners();
+            if (bookButton != null) bookButton.onClick.RemoveAllListeners();
 
             dynamiteButton = null;
             drugButton = null;
@@ -280,7 +343,16 @@ public class StoreManager : MonoBehaviour
         if (itemDrug != null) drugPriceText.text = drugPrice + " Vàng";
         if (itemLuck != null) luckPriceText.text = luckPrice + " Vàng";
         if (itemStrength != null) strengthPriceText.text = strengthPrice + " Vàng";
-        if (itemBook != null) bookPriceText.text = bookPrice + " Vàng";  
+        if (itemBook != null) bookPriceText.text = bookPrice + " Vàng";
+    }
+
+    private void UpdateButtonStates()
+    {
+        if (dynamiteButton != null) dynamiteButton.interactable = CanBuyItem("Dynamite");
+        if (drugButton != null) drugButton.interactable = CanBuyItem("Drug");
+        if (luckButton != null) luckButton.interactable = CanBuyItem("Luck");
+        if (strengthButton != null) strengthButton.interactable = CanBuyItem("Streng");
+        if (bookButton != null) bookButton.interactable = CanBuyItem("Book");
     }
 
     void OnDestroy()

@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     public int currentLevel = 1;
     public int goldAmount = 0;
 
-    private int initialTime = 5;
+    private int initialTime = 15;
     private int timeLeft;
     private int pendingScore;
     private bool shouldStartNextMission = false;
@@ -132,8 +132,6 @@ public class GameManager : MonoBehaviour
         initialTime = 20 + (currentLevel * 6); 
         timeLeft = initialTime;
         _nextScore = (score > 10000) ? score / 4 + (ScoreControl.instance?.GetTargetScore() ?? 0) : score / 2 + (ScoreControl.instance?.GetTargetScore() ?? 0);
-
-        Debug.Log($"NextMission: score = {score}, _nextScore = {_nextScore}, initialTime = {initialTime}, currentLevel = {currentLevel}");
         ScoreControl.instance?.SetTargetScore(_nextScore);
         UIManager.instance?.ShowMissionPanel(_nextScore);
         StartCoroutine(HideMissionPanelAndContinue(3f));
@@ -225,7 +223,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void HomeButton() => SceneManager.LoadScene("MainMenu");
-    public void PlayAgainButton() { ScoreControl.instance?.PlayAgainGame(); SceneManager.LoadScene("GamePlay"); UIManager.instance.HidePanels(); }
+    public void PlayAgainButton() { ScoreControl.instance?.PlayAgainGame();  UIManager.instance.HidePanels(); }
     public void PlayButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
     public void ContinueButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
     public void StopButton() { Time.timeScale = 0; UIManager.instance?.menuGamePanel?.SetActive(true); StopCountdown(); }

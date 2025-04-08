@@ -20,23 +20,53 @@ public class ScorePopupManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
 
-        if (gameCanvas == null)
+    private void OnEnable() => UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        if (scene.name == "GamePlay")
         {
-            Debug.Log("Not find canvas");
+            UpdateCanvas(); 
+        }
+    }
+
+    private void UpdateCanvas()
+    {
+        if (gameCanvas == null || gameCanvas.Equals(null))
+        {
             gameCanvas = FindObjectOfType<Canvas>();
+            if (gameCanvas == null)
+            {
+                Debug.LogError("Không tìm thấy Canvas trong scene GamePlay!");
+                GameObject canvasObj = new GameObject("ScorePopupCanvas");
+                gameCanvas = canvasObj.AddComponent<Canvas>();
+                gameCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+                gameCanvas.worldCamera = Camera.main;
+                DontDestroyOnLoad(canvasObj);
+            }
+            else
+            {
+                DontDestroyOnLoad(gameCanvas.gameObject);
+            }
         }
     }
 
     public void ShowScorePopup(int amount, Vector3 worldPosition)
     {
+        UpdateCanvas(); 
+
         if (scorePopupPrefab == null || gameCanvas == null)
         {
+            Debug.LogWarning("ScorePopupPrefab hoặc gameCanvas không được gán!");
             return;
         }
 
         if (Camera.main == null)
         {
+            Debug.LogWarning("Không tìm thấy Main Camera!");
             return;
         }
 
@@ -44,17 +74,14 @@ public class ScorePopupManager : MonoBehaviour
         GameObject popup = Instantiate(scorePopupPrefab, gameCanvas.transform);
 
         RectTransform popupRect = popup.GetComponent<RectTransform>();
-        
-                Vector2 anchoredPos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    gameCanvas.GetComponent<RectTransform>(),
-                    screenPos,
-                    gameCanvas.worldCamera,
-                    out anchoredPos
-                );
-                popupRect.anchoredPosition = anchoredPos; 
-            
-        
+        Vector2 anchoredPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            gameCanvas.GetComponent<RectTransform>(),
+            screenPos,
+            gameCanvas.worldCamera,
+            out anchoredPos
+        );
+        popupRect.anchoredPosition = anchoredPos;
 
         Text popupText = popup.GetComponentInChildren<Text>();
         if (popupText != null)

@@ -79,6 +79,8 @@ public class ScoreControl : MonoBehaviour
         CheckAndSaveHighScore();
         ResetScore();
         SaveData();
+        ItemManager.Instance.ClearAllItems();
+        ItemManager.Instance.UpdateItemsContainer();
         if (UIManager.instance != null)
         {
             Destroy(UIManager.instance.gameObject);

@@ -1347,7 +1347,6 @@ MonoBehaviour:
   missionTargetText: {fileID: 909876822}
   scorePopupPrefab: {fileID: 3382624974372387664, guid: 04cf3419944650543b331baa38e0e7fc, type: 3}
   popupParent: {fileID: 0}
-  uiCanvas: {fileID: 1580862822}
 --- !u!4 &448307032
 Transform:
   m_ObjectHideFlags: 0
@@ -1525,7 +1524,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: x1
+  m_Text: 'AAAAAAAAAAAAAAA
+
+'
 --- !u!222 &548439021
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1693,7 +1694,7 @@ MonoBehaviour:
   itemsUIPrefab:
   - {fileID: 417599900937181217, guid: 8b8f50f1e517283419de396dd480e931, type: 3}
   - {fileID: 417599900937181217, guid: eb28b4403addadb409f8828a6f0be2bc, type: 3}
-  itemsContainer: {fileID: 0}
+  itemsContainer: {fileID: 1580862823}
 --- !u!224 &779853739
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3033,7 +3034,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -9.969971, y: 12.809998}
+  m_AnchoredPosition: {x: -9.969971, y: 12.810059}
   m_SizeDelta: {x: 19.93, y: 25.63}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1139148000
@@ -3997,7 +3998,7 @@ MonoBehaviour:
   - prefab: {fileID: 3921266769676967468, guid: 38e157d8794695e4f80bc8f982f6d1b4, type: 3}
     minCount: 1
     maxCount: 2
-    spawnChance: 0.667
+    spawnChance: 0.566
   - prefab: {fileID: 2254112593072529232, guid: 29c278cd28af4364790fc75aa25c063d, type: 3}
     minCount: 2
     maxCount: 4
@@ -4014,6 +4015,10 @@ MonoBehaviour:
     minCount: 1
     maxCount: 2
     spawnChance: 0.561
+  - prefab: {fileID: 6867452996904300858, guid: a0b95e77edbd401408d945706e89c4f9, type: 3}
+    minCount: 1
+    maxCount: 2
+    spawnChance: 0.796
   maxAttempts: 15
   minSpawnDistance: 1.5
   spawnAreaMin: {x: -6.8, y: -4.5}

@@ -22,7 +22,7 @@ public class Pod : MonoBehaviour
     public Vector3 _fistPosition;
     public Transform _transformPostion;
     public int _score, _count;
-    private int dynamiteCount = 0; 
+    private int dynamiteCount = 0;
     private string blindBoxReward;
 
     private Animator _animHook;
@@ -31,6 +31,8 @@ public class Pod : MonoBehaviour
     [SerializeField] public float _slow;
     [SerializeField] private Transform minerTransform;
     [SerializeField] private GameObject dynamitePrefab;
+
+    private Vector2 _screenBounds;
 
     private void Awake()
     {
@@ -87,6 +89,9 @@ public class Pod : MonoBehaviour
         useBoomClip = Resources.Load<AudioClip>("Sound/useBoom");
         _mainCamera = Camera.main;
         _fistPosition = transform.position;
+
+        // Tính toán lại _screenBounds chính xác hơn
+        _screenBounds = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, -_mainCamera.transform.position.z));
     }
 
     Transform FindChildByName(Transform parent, string name)
@@ -114,10 +119,29 @@ public class Pod : MonoBehaviour
     void Update()
     {
         if (Time.timeScale == 0 || !isMoving) return;
+
+        // Giới hạn vị trí trong tất cả trạng thái
+        ClampPosition();
+
         if (isMoving)
         {
             _HookGetObject();
         }
+    }
+
+    private void ClampPosition()
+    {
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, -_screenBounds.x + 0.5f, _screenBounds.x - 0.5f);
+        pos.y = Mathf.Clamp(pos.y, -_screenBounds.y + 0.5f, _screenBounds.y - 0.5f);
+
+        // Nếu chạm biên dưới trong trạng thái _click, chuyển sang _rewind
+        if (_state == StateMoc._click && pos.y <= -_screenBounds.y + 0.5f)
+        {
+            _state = StateMoc._rewind;
+        }
+
+        transform.position = pos;
     }
 
     protected virtual void _HookGetObject()
@@ -139,17 +163,11 @@ public class Pod : MonoBehaviour
                 break;
             case StateMoc._click:
                 transform.Translate(Vector3.down * _scrollSpeed * Time.deltaTime);
-                Vector3 viewportPos = _mainCamera.WorldToViewportPoint(transform.position);
-                if (viewportPos.y < 0 || viewportPos.x < 0 || viewportPos.x > 1)
-                {
-                    _state = StateMoc._rewind;
-                }
                 break;
             case StateMoc._rewind:
                 transform.Translate(Vector3.up * (_scrollSpeed - _slow) * Time.deltaTime);
                 float tolerance = 0.1f;
-                if (Mathf.Abs(transform.position.x - _fistPosition.x) < tolerance
-                    && Mathf.Abs(transform.position.y - _fistPosition.y) < tolerance)
+                if (Vector3.Distance(transform.position, _fistPosition) < tolerance)
                 {
                     _slow = 0;
                     _flagCollect = false;
@@ -176,7 +194,6 @@ public class Pod : MonoBehaviour
                             {
                                 blindBoxReward = blindBox.GetRewardType();
                                 ApplyBlindBoxReward(blindBoxReward);
-                                Debug.Log($"BLind Box");
                             }
                             _score += goldPoints;
                             _count++;
@@ -194,7 +211,7 @@ public class Pod : MonoBehaviour
                             if (_animMiner != null) _animMiner.Play("MinerRewind");
                         }
                         _transformPostion = null;
-                        blindBoxReward = null; 
+                        blindBoxReward = null;
                     }
                     _state = StateMoc._rotation;
                     if (_animMiner != null) _animMiner.Play("MinerBaseState");
@@ -205,7 +222,7 @@ public class Pod : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Gold") || collision.gameObject.CompareTag("TNT") )
+        if (collision.gameObject.CompareTag("Gold") || collision.gameObject.CompareTag("TNT") || collision.gameObject.CompareTag("mouse"))
         {
             _state = StateMoc._rewind;
             _transformPostion = collision.gameObject.transform;
@@ -229,7 +246,6 @@ public class Pod : MonoBehaviour
             {
                 _slow = gold.RewindObject.weight;
             }
-            
 
             Animator mouseAnim = mouse?.GetComponent<Animator>();
             Animator goldAnim = gold?.GetComponent<Animator>();
@@ -242,12 +258,13 @@ public class Pod : MonoBehaviour
             }
         }
     }
+
     public void SetCollectedObject(Transform obj, string reward = null)
     {
         _transformPostion = obj;
         if (reward != null)
         {
-            blindBoxReward = reward; 
+            blindBoxReward = reward;
         }
     }
 
@@ -259,28 +276,19 @@ public class Pod : MonoBehaviour
         {
             case "Dynamite":
                 AddDynamite();
-                Debug.Log("Nhận được Dynamite từ BlindBox!");
                 break;
             case "Time":
                 AddTime(10f);
-                Debug.Log("Nhận được Time (+10s) từ BlindBox!");
                 break;
         }
     }
 
-
     public void AddDynamite()
     {
-        ItemManager.Instance.AddItem("Dynamite", null, () =>
-        {
-            Debug.Log("Dynamite đã được sử dụng");
-        });
+        ItemManager.Instance.AddItem("Dynamite", null, () => { });
         dynamiteCount++;
-        Debug.Log($"Số lượng Dynamite hiện tại: {dynamiteCount}");
-
         UIManager.instance?.UpdateDynamiteCount(dynamiteCount);
     }
-
 
     public void AddTime(float additionalTime)
     {
@@ -353,7 +361,6 @@ public class Pod : MonoBehaviour
         }
     }
 
-
     public bool UseStreng()
     {
         if (isStrengthActive)
@@ -385,4 +392,4 @@ public class Pod : MonoBehaviour
             if (_animMiner != null) _animMiner.Play("MinerRewind");
         }
     }
-}
+}   

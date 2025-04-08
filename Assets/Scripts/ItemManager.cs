@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class ItemManager : MonoBehaviour
 {
     public static ItemManager Instance;
 
     [SerializeField] private GameObject[] itemsUIPrefab;
-    [SerializeField] private Transform itemsContainer;
+    [SerializeField] private Transform itemsContainer; // Có thể gán trong Inspector
 
     private List<ItemData> ownedItems = new List<ItemData>();
     private Dictionary<string, GameObject> itemButtons = new Dictionary<string, GameObject>();
+    private bool isCanvasFromInspector = false;
 
-    private bool isHaveItems = false;
     private void Awake()
     {
         if (Instance == null)
@@ -23,27 +24,73 @@ public class ItemManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
+        }
+
+        // Kiểm tra xem Canvas có được gán từ Inspector không
+        isCanvasFromInspector = itemsContainer != null;
+        if (isCanvasFromInspector)
+        {
+            DontDestroyOnLoad(itemsContainer.root.gameObject); // Bảo vệ Canvas nếu từ Inspector
+        }
+    }
+
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "GamePlay")
+        {
+            UpdateItemsContainer(); // Cập nhật Canvas khi scene tải lại
+            RestoreItemsUI(); // Khôi phục UI
         }
     }
 
     void Start()
     {
-        if (itemsContainer == null)
+        UpdateItemsContainer();
+        RestoreItemsUI(); // Khôi phục UI khi khởi động
+    }
+
+    public void UpdateItemsContainer()
+    {
+        if (itemsContainer == null || itemsContainer.Equals(null)) // Nếu Canvas bị mất hoặc chưa gán
         {
             Canvas canvas = FindObjectOfType<Canvas>();
             if (canvas != null)
             {
                 itemsContainer = canvas.transform;
+
+                // Cấu hình Canvas nếu cần (không bắt buộc nếu Canvas đã được thiết lập trong scene)
+                Canvas c = itemsContainer.GetComponent<Canvas>();
+                if (c.renderMode != RenderMode.ScreenSpaceCamera)
+                {
+                    c.renderMode = RenderMode.ScreenSpaceCamera;
+                    c.worldCamera = Camera.main;
+                    if (c.worldCamera == null)
+                    {
+                        Debug.LogWarning("Không tìm thấy Main Camera để gán cho Canvas!");
+                    }
+                }
             }
             else
             {
-                return;
+                Debug.LogError("Không tìm thấy Canvas trong scene! Vui lòng thêm Canvas hoặc gán trong Inspector.");
             }
         }
     }
 
     public void AddItem(string itemName, Sprite itemIcon = null, System.Action onUse = null)
     {
+        UpdateItemsContainer();
+
+        if (itemsContainer == null)
+        {
+            Debug.LogError("Không tìm thấy Canvas trong scene!");
+            return;
+        }
+
         if (itemName == "Dynamite" || itemName == "Streng")
         {
             ItemData item = ownedItems.Find(i => i.itemName == itemName);
@@ -58,7 +105,6 @@ public class ItemManager : MonoBehaviour
             }
             ShowItemButton(item);
 
-            // Update UI Manager when dynamite is added from any source
             if (itemName == "Dynamite" && UIManager.instance != null)
             {
                 int dynamiteCount = item.quantity;
@@ -140,13 +186,11 @@ public class ItemManager : MonoBehaviour
         {
             bool useSuccess = false;
 
-            // Execute the item action separately from consumption logic
             if (item.onUse != null)
             {
                 item.onUse.Invoke();
             }
 
-            // Handle specific item types consistently
             if (item.itemName == "Dynamite")
             {
                 useSuccess = Pod.instance.UseDynamite();
@@ -158,7 +202,6 @@ public class ItemManager : MonoBehaviour
             }
             else
             {
-                // For other items, assume success
                 useSuccess = true;
             }
 
@@ -166,7 +209,6 @@ public class ItemManager : MonoBehaviour
             {
                 item.quantity--;
 
-                // Update UI Manager for dynamite
                 if (item.itemName == "Dynamite" && UIManager.instance != null)
                 {
                     UIManager.instance.UpdateDynamiteCount(item.quantity);
@@ -189,7 +231,6 @@ public class ItemManager : MonoBehaviour
         }
     }
 
-    // Helper method to check dynamite count
     public int GetItemCount(string itemName)
     {
         ItemData item = ownedItems.Find(i => i.itemName == itemName);
@@ -199,5 +240,28 @@ public class ItemManager : MonoBehaviour
     private void OnDestroy()
     {
         if (Instance == this) Instance = null;
+    }
+
+    private void RestoreItemsUI()
+    {
+        foreach (var item in ownedItems)
+        {
+            ShowItemButton(item);
+        }
+    }
+
+    public void OnPlayAgain()
+    {
+        foreach (var button in itemButtons.Values)
+        {
+            Destroy(button);
+        }
+        itemButtons.Clear();
+        if (!isCanvasFromInspector)
+        {
+            itemsContainer = null;
+        }
+        UpdateItemsContainer();
+        RestoreItemsUI();
     }
 }

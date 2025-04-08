@@ -62,7 +62,7 @@ public class UIManager : MonoBehaviour
             uiCanvas = gameObject.AddComponent<Canvas>();
         }
         uiCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-        uiCanvas.worldCamera = Camera.main; // Gán Main Camera
+        uiCanvas.worldCamera = Camera.main; 
         if (uiCanvas.worldCamera == null)
         {
             Debug.LogWarning("Không tìm thấy Main Camera khi tạo Canvas!");
@@ -103,6 +103,14 @@ public class UIManager : MonoBehaviour
             SetupCanvas();
             timeText = GameObject.Find("Time")?.GetComponent<Text>();
             dynamiteText = GameObject.Find("CountDynamite")?.GetComponent<Text>();
+            if (dynamiteText != null && string.IsNullOrEmpty(dynamiteText.text))
+            {
+                dynamiteText.gameObject.SetActive(!string.IsNullOrEmpty(dynamiteText.text) && int.Parse(dynamiteText.text) > 0);
+            }
+            else
+            {
+                dynamiteText.gameObject.SetActive(false);
+            }
             scoreText = GameObject.Find("Score")?.GetComponent<Text>();
             targetScoreText = GameObject.Find("target")?.GetComponent<Text>();
             notificationText = GameObject.Find("NotiText")?.GetComponent<Text>();

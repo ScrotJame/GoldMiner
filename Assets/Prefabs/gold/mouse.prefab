@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1691701918526255361}
   m_Layer: 0
   m_Name: mouse
-  m_TagString: Gold
+  m_TagString: mouse
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -105,6 +105,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RewindObject: {fileID: 11400000, guid: eeb178116417c184cbc410b0be014961, type: 2}
   currentState: 0
+  health: 1
+  destroyEffect: {fileID: 0}
   _moveSpeed: 1
 --- !u!50 &8903627661460089466
 Rigidbody2D:
@@ -163,7 +165,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
