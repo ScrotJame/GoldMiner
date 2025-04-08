@@ -19,20 +19,9 @@ public class ItemManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        // Kiểm tra xem Canvas có được gán từ Inspector không
         isCanvasFromInspector = itemsContainer != null;
-        if (isCanvasFromInspector)
-        {
-            DontDestroyOnLoad(itemsContainer.root.gameObject); // Bảo vệ Canvas nếu từ Inspector
-        }
+        // Remove the DontDestroyOnLoad line from here
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
@@ -42,27 +31,41 @@ public class ItemManager : MonoBehaviour
     {
         if (scene.name == "GamePlay")
         {
-            UpdateItemsContainer(); // Cập nhật Canvas khi scene tải lại
-            RestoreItemsUI(); // Khôi phục UI
+            UpdateItemsContainer();
+            RestoreItemsUI();
+        }
+        else if (scene.name == "MainMenu")
+        {
+            // Clean up all UI elements when transitioning to MainMenu
+            ClearAllItems();
+            if (!isCanvasFromInspector && itemsContainer != null)
+            {
+                itemsContainer = null;
+            }
+
+            // If we are returning to main menu, destroy this instance
+            if (Instance == this)
+            {
+                Instance = null;
+                Destroy(gameObject);
+            }
         }
     }
 
     void Start()
     {
         UpdateItemsContainer();
-        RestoreItemsUI(); // Khôi phục UI khi khởi động
+        RestoreItemsUI();
     }
 
     public void UpdateItemsContainer()
     {
-        if (itemsContainer == null || itemsContainer.Equals(null)) // Nếu Canvas bị mất hoặc chưa gán
+        if (itemsContainer == null || itemsContainer.Equals(null))
         {
             Canvas canvas = FindObjectOfType<Canvas>();
             if (canvas != null)
             {
                 itemsContainer = canvas.transform;
-
-                // Cấu hình Canvas nếu cần (không bắt buộc nếu Canvas đã được thiết lập trong scene)
                 Canvas c = itemsContainer.GetComponent<Canvas>();
                 if (c.renderMode != RenderMode.ScreenSpaceCamera)
                 {
@@ -164,7 +167,13 @@ public class ItemManager : MonoBehaviour
 
     private void UpdateButtonUI(ItemData item)
     {
+        if (!itemButtons.ContainsKey(item.itemName))
+            return;
+
         GameObject buttonObj = itemButtons[item.itemName];
+        if (buttonObj == null)
+            return;
+
         Text quantityText = buttonObj.transform.Find("QuantityText")?.GetComponent<Text>();
         if (quantityText != null) quantityText.text = "x" + item.quantity;
     }
@@ -173,7 +182,8 @@ public class ItemManager : MonoBehaviour
     {
         foreach (var button in itemButtons.Values)
         {
-            Destroy(button);
+            if (button != null)
+                Destroy(button);
         }
         itemButtons.Clear();
         ownedItems.Clear();
@@ -239,7 +249,11 @@ public class ItemManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+        {
+            Instance = null;
+            ClearAllItems();
+        }
     }
 
     private void RestoreItemsUI()
@@ -254,7 +268,8 @@ public class ItemManager : MonoBehaviour
     {
         foreach (var button in itemButtons.Values)
         {
-            Destroy(button);
+            if (button != null)
+                Destroy(button);
         }
         itemButtons.Clear();
         if (!isCanvasFromInspector)

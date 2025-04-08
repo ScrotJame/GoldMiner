@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+
         if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
 
         UIManager.instance?.HidePanels();
@@ -94,13 +95,15 @@ public class GameManager : MonoBehaviour
 
         StartCountdown();
     }
+
     private void Start()
     {
-        if(currentLevel == 1)
+        if (currentLevel == 1)
         {
             ScoreControl.instance?.StartNewGame();
         }
     }
+
     private void StartCountdown()
     {
         if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
@@ -129,7 +132,7 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0;
         currentLevel++;
-        initialTime = 20 + (currentLevel * 6); 
+        initialTime = 20 + (currentLevel * 6);
         timeLeft = initialTime;
         _nextScore = (score > 10000) ? score / 4 + (ScoreControl.instance?.GetTargetScore() ?? 0) : score / 2 + (ScoreControl.instance?.GetTargetScore() ?? 0);
         ScoreControl.instance?.SetTargetScore(_nextScore);
@@ -166,7 +169,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                ItemManager.Instance.ClearAllItems();   
+                ItemManager.Instance.ClearAllItems();
                 UIManager.instance?.ShowNotification("Mission Failed! \n Do you want to try again?");
                 ScoreControl.instance?.StartNewGame();
                 pod?.StopMovement();
@@ -200,7 +203,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     public void ResetGameForNewLevel()
     {
         spawner?.ResetLevel();
@@ -222,11 +224,41 @@ public class GameManager : MonoBehaviour
         StartCountdown();
     }
 
-    public void HomeButton() => SceneManager.LoadScene("MainMenu");
-    public void PlayAgainButton() { ScoreControl.instance?.PlayAgainGame();  UIManager.instance.HidePanels(); }
-    public void PlayButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
-    public void ContinueButton() { UIManager.instance?.HidePanels(); Time.timeScale = 1; StartCountdown(); }
-    public void StopButton() { Time.timeScale = 0; UIManager.instance?.menuGamePanel?.SetActive(true); StopCountdown(); }
+    public void HomeButton()
+    {
+        UIManager.instance.ClearUIReferences();
+        UIManager.instance.HidePanels();
+        ItemManager.Instance.ClearAllItems();
+        SceneManager.LoadScene("MainMenu");
+    }
+
+
+    public void PlayAgainButton()
+    {
+        ScoreControl.instance?.PlayAgainGame();
+        UIManager.instance?.HidePanels();
+    }
+
+    public void PlayButton()
+    {
+        UIManager.instance?.HidePanels();
+        Time.timeScale = 1;
+        StartCountdown();
+    }
+
+    public void ContinueButton()
+    {
+        UIManager.instance?.HidePanels();
+        Time.timeScale = 1;
+        StartCountdown();
+    }
+
+    public void StopButton()
+    {
+        Time.timeScale = 0;
+        UIManager.instance?.menuGamePanel?.SetActive(true);
+        StopCountdown();
+    }
 
     private void StopCountdown()
     {
@@ -293,7 +325,7 @@ public class GameManager : MonoBehaviour
 
     public void AddTime(float additionalTime)
     {
-        timeLeft += (int)additionalTime; 
-        UIManager.instance?.UpdateTime(timeLeft); 
+        timeLeft += (int)additionalTime;
+        UIManager.instance?.UpdateTime(timeLeft);
     }
 }

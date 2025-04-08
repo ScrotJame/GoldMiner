@@ -132,14 +132,21 @@ public class Pod : MonoBehaviour
     private void ClampPosition()
     {
         Vector3 pos = transform.position;
+
+        bool hitBoundary = false;
+
+        if (pos.x <= -_screenBounds.x + 0.5f || pos.x >= _screenBounds.x - 0.5f ||
+            pos.y <= -_screenBounds.y + 0.5f || pos.y >= _screenBounds.y - 0.5f)
+        {
+            if (_state == StateMoc._click)
+            {
+                _state = StateMoc._rewind;
+                hitBoundary = true;
+            }
+        }
+
         pos.x = Mathf.Clamp(pos.x, -_screenBounds.x + 0.5f, _screenBounds.x - 0.5f);
         pos.y = Mathf.Clamp(pos.y, -_screenBounds.y + 0.5f, _screenBounds.y - 0.5f);
-
-        // Nếu chạm biên dưới trong trạng thái _click, chuyển sang _rewind
-        if (_state == StateMoc._click && pos.y <= -_screenBounds.y + 0.5f)
-        {
-            _state = StateMoc._rewind;
-        }
 
         transform.position = pos;
     }
@@ -392,4 +399,4 @@ public class Pod : MonoBehaviour
             if (_animMiner != null) _animMiner.Play("MinerRewind");
         }
     }
-}   
+}

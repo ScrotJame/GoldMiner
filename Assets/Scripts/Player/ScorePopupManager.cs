@@ -14,7 +14,6 @@ public class ScorePopupManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -45,11 +44,11 @@ public class ScorePopupManager : MonoBehaviour
                 gameCanvas = canvasObj.AddComponent<Canvas>();
                 gameCanvas.renderMode = RenderMode.ScreenSpaceCamera;
                 gameCanvas.worldCamera = Camera.main;
-                DontDestroyOnLoad(canvasObj);
+              //  DontDestroyOnLoad(canvasObj);
             }
             else
             {
-                DontDestroyOnLoad(gameCanvas.gameObject);
+             //   DontDestroyOnLoad(gameCanvas.gameObject);
             }
         }
     }

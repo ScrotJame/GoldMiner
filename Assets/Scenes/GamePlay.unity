@@ -1345,7 +1345,7 @@ MonoBehaviour:
   missionPanel: {fileID: 412253773}
   storePanel: {fileID: 0}
   missionTargetText: {fileID: 909876822}
-  scorePopupPrefab: {fileID: 3382624974372387664, guid: 04cf3419944650543b331baa38e0e7fc, type: 3}
+  scorePopupPrefab: {fileID: 0}
   popupParent: {fileID: 0}
 --- !u!4 &448307032
 Transform:
@@ -2375,9 +2375,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 563083759}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: _StopButton
+        m_MethodName: StopButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2710,9 +2710,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 563083759}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: _ContinueButton
+        m_MethodName: ContinueButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3791,9 +3791,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 563083759}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: _HomeButton
+        m_MethodName: HomeButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

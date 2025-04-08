@@ -35,34 +35,27 @@ public class UIManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            // Tạo Canvas mới
-            SetupCanvas();
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
     }
 
     private void SetupCanvas()
     {
-        // Xóa Canvas cũ nếu có
         if (uiCanvas != null)
         {
             Destroy(uiCanvas);
         }
 
-        // Tạo Canvas mới
         uiCanvas = gameObject.GetComponent<Canvas>();
         if (uiCanvas == null)
         {
             uiCanvas = gameObject.AddComponent<Canvas>();
         }
         uiCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-        uiCanvas.worldCamera = Camera.main; 
+        uiCanvas.worldCamera = Camera.main;
         if (uiCanvas.worldCamera == null)
         {
             Debug.LogWarning("Không tìm thấy Main Camera khi tạo Canvas!");
@@ -144,6 +137,33 @@ public class UIManager : MonoBehaviour
                 StartCoroutine(HideMissionPanelAfterDelay(3f));
             }
         }
+        else if (scene.name == "MainMenu")
+        {
+            // Kiểm tra nếu MainMenu đã có Canvas
+            Canvas[] existingCanvases = FindObjectsOfType<Canvas>();
+            foreach (Canvas canvas in existingCanvases)
+            {
+                // Kiểm tra nếu Canvas này không phải của UIManager (tức là thuộc MainMenu)
+                if (canvas.gameObject != gameObject)
+                {
+                    // Nếu MainMenu có Canvas, hủy Canvas của UIManager
+                    if (uiCanvas != null)
+                    {
+                        Destroy(uiCanvas); // Hủy Canvas component
+                    }
+                    Destroy(gameObject); // Hủy toàn bộ UIManager
+                    return; // Thoát khỏi hàm sau khi hủy
+                }
+            }
+
+            // Nếu không có Canvas trong MainMenu, chỉ ẩn UI
+            ClearUIReferences();
+            HidePanels();
+            if (uiCanvas != null)
+            {
+                uiCanvas.enabled = false; // Tắt Canvas nếu không hủy
+            }
+        }
     }
 
     public void UpdateTime(int time)
@@ -198,6 +218,27 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(delay);
         if (missionPanel != null) missionPanel.SetActive(false);
         missionPanelCoroutine = null;
+    }
+
+    public void ClearUIReferences()
+    {
+        HidePanels();
+        if (uiCanvas != null && !uiCanvas.Equals(null))
+        {
+            uiCanvas.enabled = false;
+        }
+        timeText = null;
+        numberText = null;
+        notificationText = null;
+        scoreText = null;
+        targetScoreText = null;
+        highScoreText = null;
+        dynamiteText = null;
+        gameNotificationPanel = null;
+        menuGamePanel = null;
+        missionPanel = null;
+        missionTargetText = null;
+        popupParent = null;
     }
 
     public void HidePanels()

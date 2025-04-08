@@ -71,7 +71,7 @@ public class StoreManager : MonoBehaviour
             mainCanvas = FindObjectOfType<Canvas>();
             if (mainCanvas != null)
             {
-                DontDestroyOnLoad(mainCanvas.gameObject);
+            //    DontDestroyOnLoad(mainCanvas.gameObject);
             }
             else
             {
@@ -91,7 +91,6 @@ public class StoreManager : MonoBehaviour
     {
         if (!CanBuyItem("Luck"))
         {
-            Debug.Log($"Luck chỉ có thể mua lại ở màn {itemPurchaseLevel["Luck"] + 2} trở đi!");
             return;
         }
 
@@ -117,16 +116,13 @@ public class StoreManager : MonoBehaviour
     {
         if (!CanBuyItem("Dynamite"))
         {
-            Debug.Log($"Dynamite chỉ có thể mua lại ở màn {itemPurchaseLevel["Dynamite"] + 2} trở đi!");
             return;
         }
 
         if (ScoreControl.instance.SpendScore(dynamitePrice))
         {
-            Debug.Log("Đã mua Dynamite!");
             ItemManager.Instance.AddItem("Dynamite", dynamiteSprite, () =>
             {
-                Debug.Log("Dynamite added to inventory");
             });
 
             int dynamiteCount = ItemManager.Instance.GetItemCount("Dynamite");
