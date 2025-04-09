@@ -34,6 +34,7 @@ public class Pod : MonoBehaviour
 
     private Vector2 _screenBounds;
 
+    AudioManager audioManager;
     private void Awake()
     {
         if (instance == null)
@@ -45,6 +46,7 @@ public class Pod : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
@@ -90,7 +92,6 @@ public class Pod : MonoBehaviour
         _mainCamera = Camera.main;
         _fistPosition = transform.position;
 
-        // Tính toán lại _screenBounds chính xác hơn
         _screenBounds = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, -_mainCamera.transform.position.z));
     }
 
@@ -120,7 +121,6 @@ public class Pod : MonoBehaviour
     {
         if (Time.timeScale == 0 || !isMoving) return;
 
-        // Giới hạn vị trí trong tất cả trạng thái
         ClampPosition();
 
         if (isMoving)
@@ -185,19 +185,21 @@ public class Pod : MonoBehaviour
                         if (gold != null)
                         {
                             Destroy(_transformPostion.gameObject);
-                            if (_animHook != null) _animHook.SetBool("got", false);
+                            if (_animHook != null) { _animHook.SetBool("got", false);  }
                             if (_animMiner != null) _animMiner.Play("MinerRewind");
-
                             int goldPoints = gold.RewindObject.point;
-                            if (Spawner.instance != null && Spawner.instance.IsDrugActive && gold.gameObject.name.Contains("kc_2_0"))
-                            {
-                                goldPoints *= 2;
-                            }
-                            if (Spawner.instance != null && Spawner.instance.IsDrugActive && (gold.gameObject.name.Contains("Stone") || gold.gameObject.name.Contains("Stone2")))
-                            {
-                                goldPoints *= 3;
-                            }
-                            if (gold.gameObject.name.Contains("tui_0"))
+                            
+                                if (Spawner.instance != null && Spawner.instance.IsDrugActive && gold.gameObject.name.Contains("kc_2_0"))
+                                {
+                                    goldPoints *= 2;
+                                }
+
+                                if (Spawner.instance != null && Spawner.instance.IsDrugActive && (gold.gameObject.name.Contains("Stone") || gold.gameObject.name.Contains("Stone2")))
+                                {
+                                    goldPoints *= 3;
+                                }
+                            
+                                if (gold.gameObject.name.Contains("tui_0"))
                             {
                                 blindBoxReward = blindBox.GetRewardType();
                                 ApplyBlindBoxReward(blindBoxReward);
@@ -209,6 +211,7 @@ public class Pod : MonoBehaviour
                             {
                                 ScoreControl.instance.AddScore(goldPoints);
                             }
+                            audioManager.PlaySFX(audioManager.got);
                         }
                         else if (blindBox != null)
                         {

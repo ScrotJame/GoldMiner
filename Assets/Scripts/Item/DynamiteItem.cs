@@ -8,8 +8,12 @@ public class DynamiteItem : MonoBehaviour
     private Transform targetItem;
     private AudioClip explosionClip;
     private AudioSource audioSource;
-    private Pod pod; 
-
+    private Pod pod;
+    AudioManager audioManager;
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
     public void Initialize(Vector3 startPos, Vector3 targetPos, Transform itemToDestroy, Pod podScript)
     {
         transform.position = startPos;
@@ -54,6 +58,7 @@ public class DynamiteItem : MonoBehaviour
                 audioSource.PlayOneShot(explosionClip);
             }
 
+            audioManager.PlaySFX(audioManager.boom);
             if (goldAnim != null)
             {
                 goldAnim.Play("flame_anim");

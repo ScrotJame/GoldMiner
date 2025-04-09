@@ -8,7 +8,7 @@ public class ItemManager : MonoBehaviour
     public static ItemManager Instance;
 
     [SerializeField] private GameObject[] itemsUIPrefab;
-    [SerializeField] private Transform itemsContainer; // Có thể gán trong Inspector
+    [SerializeField] private Transform itemsContainer;
 
     private List<ItemData> ownedItems = new List<ItemData>();
     private Dictionary<string, GameObject> itemButtons = new Dictionary<string, GameObject>();
@@ -21,7 +21,6 @@ public class ItemManager : MonoBehaviour
             Instance = this;
         }
         isCanvasFromInspector = itemsContainer != null;
-        // Remove the DontDestroyOnLoad line from here
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;

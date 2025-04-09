@@ -8,8 +8,12 @@ public class TNT_s : GoldBase
     public LayerMask targetLayer;
 
     public GameObject explosionEffect;
-    public GameObject shockwavePrefab;  
-
+    public GameObject shockwavePrefab;
+    AudioManager audioManager;
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
     void Explode()
     {
         if (explosionEffect != null)
@@ -37,6 +41,7 @@ public class TNT_s : GoldBase
             }
 
             GoldBase destroyable = hit.collider.GetComponent<GoldBase>();
+            audioManager.PlaySFX(audioManager.boom);
             if (destroyable != null)
             {
                 destroyable.TakeDamage();

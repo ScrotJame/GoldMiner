@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     private Pod pod;
     public int _nextScore;
 
+    AudioManager audioManager;
     private void Awake()
     {
         if (instance == null)
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        audioManager = GameObject.FindGameObjectWithTag("Audio")?.GetComponent<AudioManager>();
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
@@ -169,6 +171,8 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                audioManager.background.Stop();
+                audioManager.PlaySFX(audioManager.lost);
                 ItemManager.Instance.ClearAllItems();
                 UIManager.instance?.ShowNotification("Mission Failed! \n Do you want to try again?");
                 ScoreControl.instance?.StartNewGame();
@@ -281,6 +285,7 @@ public class GameManager : MonoBehaviour
 
     public void ResumeGameAfterShop()
     {
+        audioManager.background.Play();
         if (pod == null || pod.Equals(null))
         {
             if (pod == null)

@@ -173,7 +173,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 88
+  controlID: 133
   draggingID: 0
 --- !u!114 &8
 MonoBehaviour:
@@ -608,7 +608,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 16f0fdff561cfeffce1cfeffd81cfeff641efeff6c22feffca22feff8024feff0032feffd234feff0458feff465afeff5699feff36a6feff50a6feff6aa6feff84a6feff9ea6feffaea6feffb8a6feff3aa8feffaeb2fefff8b9feff48c3feff92ecfefff2edfeffaafcfeff8cfffeffec1cffffc820ffffaa60ffffb460ffffcabcffff8cc4ffff7cecffff0cfbfffff4ffffff8090000000910000089100003a91000090910000ac910000e69c00001eac0000be010100bc020100dc050100fc1c0100d22301006c250100ae370100243e0100a64a0100264b0100944b0100a44b0100b64b0100d24b0100b25501002e77010032990100a09a010080aa01003cab010014ae0100d0ae0100f4b00100baba010012c60100
+      m_ExpandedIDs: eaf4ffff1af7ffff78f9ffff0cfbfffff4ffffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -680,7 +680,7 @@ MonoBehaviour:
     m_SkipHidden: 1
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets/Scenes
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -690,16 +690,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/Scenes
   m_LastFoldersGridSize: 16
   m_LastProjectPath: B:\GoldMiner
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 6c950000
-    m_LastClickedID: 38252
-    m_ExpandedIDs: 000000007a9500007c9500007e950000
+    m_SelectedIDs: ea950000
+    m_LastClickedID: 38378
+    m_ExpandedIDs: 00000000fe9100000092000002920000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -728,7 +728,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000007a9500007c9500007e950000
+    m_ExpandedIDs: 00000000fe9100000092000002920000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1402,9 +1402,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 0, y: 0, z: 90}
+    m_Target: {x: -7.796315, y: -2.2896206, z: 2183.366}
     speed: 2
-    m_Value: {x: 0, y: 0, z: 90}
+    m_Value: {x: -7.796315, y: -2.2896206, z: 2183.366}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1454,9 +1454,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 0.8660254
+    m_Target: 10.645328
     speed: 2
-    m_Value: 0.8660254
+    m_Value: 10.645328
   m_Ortho:
     m_Target: 1
     speed: 2

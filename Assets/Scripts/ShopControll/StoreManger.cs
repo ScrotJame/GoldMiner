@@ -43,6 +43,7 @@ public class StoreManager : MonoBehaviour
     private Button bookButton;
     private Button continueButton;
 
+    AudioManager audioManager;
     [SerializeField] private Sprite dynamiteSprite;
 
     private Dictionary<string, int> itemPurchaseLevel = new Dictionary<string, int>
@@ -65,7 +66,7 @@ public class StoreManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
+        audioManager = GameObject.FindGameObjectWithTag("Audio")?.GetComponent<AudioManager>();
         if (mainCanvas == null)
         {
             mainCanvas = FindObjectOfType<Canvas>();
@@ -96,6 +97,7 @@ public class StoreManager : MonoBehaviour
 
         if (ScoreControl.instance.SpendScore(luckPrice))
         {
+            audioManager.PlayRandomCashout();
             ItemManager.Instance.AddItem("Luck", null, () =>
             {
                 Spawner.instance.ApplyLuckBoost();
@@ -121,6 +123,7 @@ public class StoreManager : MonoBehaviour
 
         if (ScoreControl.instance.SpendScore(dynamitePrice))
         {
+            audioManager.PlayRandomCashout();
             ItemManager.Instance.AddItem("Dynamite", dynamiteSprite, () =>
             {
             });
@@ -149,10 +152,10 @@ public class StoreManager : MonoBehaviour
             Debug.Log($"Drug chỉ có thể mua lại ở màn {itemPurchaseLevel["Drug"] + 2} trở đi!");
             return;
         }
-
         if (ScoreControl.instance.SpendScore(drugPrice))
         {
-            Debug.Log("Đã mua Drug!");
+
+            audioManager.PlayRandomCashout();
             ItemManager.Instance.AddItem("Drug", null, () =>
             {
                 Spawner.instance.ApplyDrugEffect();
@@ -177,12 +180,11 @@ public class StoreManager : MonoBehaviour
             Debug.Log($"Strength chỉ có thể mua lại ở màn {itemPurchaseLevel["Streng"] + 2} trở đi!");
             return;
         }
-
         if (ScoreControl.instance.SpendScore(strengthPrice))
         {
+            audioManager.PlayRandomCashout();
             ItemManager.Instance.AddItem("Streng", null, () =>
             {
-                Debug.Log("Strength đã được sử dụng");
             });
             Destroy(itemStrength);
             itemStrength = null;
@@ -199,10 +201,10 @@ public class StoreManager : MonoBehaviour
             Debug.Log($"Book chỉ có thể mua lại ở màn {itemPurchaseLevel["Book"] + 2} trở đi!");
             return;
         }
-
         if (ScoreControl.instance.SpendScore(bookPrice))
         {
-            Debug.Log("Đã mua Book!");
+
+            audioManager.PlayRandomCashout();
             ItemManager.Instance.AddItem("Book", owner, () =>
             {
                 Spawner.instance.ApplyBookEffect();
@@ -217,6 +219,7 @@ public class StoreManager : MonoBehaviour
 
     public void ShowShop()
     {
+        audioManager.background.Stop(); 
         GameManager.instance.PauseGameForShop();
 
         if (mainCanvas == null || mainCanvas.Equals(null))

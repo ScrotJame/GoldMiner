@@ -90,6 +90,7 @@
     <Compile Include="Assets\Scripts\ItemManager.cs" />
     <Compile Include="Assets\Scripts\ShopControll\StoreManger.cs" />
     <Compile Include="Assets\Scripts\ShopControll\StoreItem.cs" />
+    <Compile Include="Assets\AudioManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
