@@ -70,14 +70,7 @@ public class StoreManager : MonoBehaviour
         if (mainCanvas == null)
         {
             mainCanvas = FindObjectOfType<Canvas>();
-            if (mainCanvas != null)
-            {
-            //    DontDestroyOnLoad(mainCanvas.gameObject);
-            }
-            else
-            {
-                Debug.LogError("No Canvas found in the scene during Awake!");
-            }
+            
         }
     }
 

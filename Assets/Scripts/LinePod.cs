@@ -8,16 +8,25 @@ public class LinePod : MonoBehaviour
     private LineRenderer lineRenderer;
     private Transform targetGold = null;
     private Animator _anim;
-    public GameObject dynamiteButton; 
+    public GameObject dynamiteButton;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
-        instance = this; 
         lineRenderer = GetComponent<LineRenderer>();
         if (lineRenderer == null)
-        {
             lineRenderer = gameObject.AddComponent<LineRenderer>();
-        }
 
         lineRenderer.positionCount = 2;
         lineRenderer.startWidth = 0.05f;
@@ -31,6 +40,7 @@ public class LinePod : MonoBehaviour
 
         lineRenderer.sortingLayerName = "Default";
         lineRenderer.sortingOrder = 5;
+
         _anim = hook.GetComponent<Animator>();
     }
 
@@ -40,9 +50,10 @@ public class LinePod : MonoBehaviour
         {
             lineRenderer.SetPosition(0, originPoint.position);
 
-            if (targetGold == null)
+            if (targetGold == null || targetGold.gameObject == null) 
             {
                 lineRenderer.SetPosition(1, hook.position);
+                targetGold = null; 
             }
             else
             {
@@ -51,13 +62,19 @@ public class LinePod : MonoBehaviour
         }
     }
 
+    public void SetTargetGold(Transform goldCenter)
+    {
+        targetGold = goldCenter;
+    }
+
+    public void ReleaseGold()
+    {
+        targetGold = null;
+    }
+
     public void ResetHook()
     {
         if (_anim != null)
-        {
-            _anim.SetBool("got", false); 
-        }
+            _anim.SetBool("got", false);
     }
-
-    
 }

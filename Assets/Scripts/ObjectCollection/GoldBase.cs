@@ -42,9 +42,9 @@ public class GoldBase : MonoBehaviour
     private void OnDestroy()
     {
         LinePod linePod = FindObjectOfType<LinePod>();
-        if (linePod != null)
+        if (LinePod.instance != null)
         {
-            linePod.ResetHook();
+            LinePod.instance.ReleaseGold();
         }
     }
     public void TakeDamage()

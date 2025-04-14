@@ -1,0 +1,12 @@
+# ninja log v5
+81	1048	7658854029024738	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	78bc067bb5a1c5c0
+1051	1730	7658854034284233	B:/GoldMiner/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/53t13hlo/obj/arm64-v8a/libswappywrapper.so	c185c73bbb412888
+29	3448	7658854053305889	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	85573f9dc683a6b7
+21	3471	7658854053345892	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	c4feba74b1b14a1b
+72	3615	7658854054506332	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	26e8561ca5b2614c
+1	3666	7658854055416546	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	af39ab90ae113cce
+8	3670	7658854055456556	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	405dc32dddf2d6fa
+55	3709	7658854055956945	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e70d81e9c99039c
+43	4085	7658854059749626	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	f03179d8f8a1a29c
+14	4175	7658854060651806	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	b1b845a0f141f188
+4175	4299	7658854061970868	B:/GoldMiner/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/53t13hlo/obj/arm64-v8a/libgame.so	82c31f8676baa968

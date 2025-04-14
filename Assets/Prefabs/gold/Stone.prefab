@@ -33,7 +33,8 @@ Transform:
   m_LocalPosition: {x: -4.39, y: 1.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 88090021472370051}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6359921370029783470
@@ -210,3 +211,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RewindObject: {fileID: 11400000, guid: 047fdc361cb248d49a87357f4ffef9e5, type: 2}
   currentState: 0
+  health: 1
+  destroyEffect: {fileID: 0}
+--- !u!1 &1297376592452025115
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 88090021472370051}
+  m_Layer: 0
+  m_Name: GoldCenter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &88090021472370051
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297376592452025115}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.03, y: 0.41, z: -0.007951108}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2751594023355813491}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

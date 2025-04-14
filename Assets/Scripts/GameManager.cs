@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     public int currentLevel = 1;
     public int goldAmount = 0;
 
-    private int initialTime = 15;
+    private int initialTime =15;
     private int timeLeft;
     private int pendingScore;
     private bool shouldStartNextMission = false;
@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0;
         currentLevel++;
-        initialTime = 20 + (currentLevel * 6);
+        initialTime = 15 + (currentLevel * 6);
         timeLeft = initialTime;
         _nextScore = (score > 10000) ? score / 4 + (ScoreControl.instance?.GetTargetScore() ?? 0) : score / 2 + (ScoreControl.instance?.GetTargetScore() ?? 0);
         ScoreControl.instance?.SetTargetScore(_nextScore);
@@ -165,12 +165,14 @@ public class GameManager : MonoBehaviour
             int targetScore = ScoreControl.instance?.GetTargetScore() ?? 0;
             if (score >= targetScore)
             {
+                UIManager.instance?.HideButton();
                 UIManager.instance?.ShowNotification("Mission Complete!");
                 StartCoroutine(WaitBeforeNextMission(score));
                 pod?.StopMovement();
             }
             else
             {
+                UIManager.instance?.InitializeButtons(); 
                 audioManager.background.Stop();
                 audioManager.PlaySFX(audioManager.lost);
                 ItemManager.Instance.ClearAllItems();
@@ -197,14 +199,28 @@ public class GameManager : MonoBehaviour
             NoButt.SetActive(false);
         }
 
-        if (StoreManager.Instance != null)
+        GoogleAdsManager adsManager = FindObjectOfType<GoogleAdsManager>();
+        if (adsManager != null && adsManager.IsBannerAdLoaded() && currentLevel%2 == 0)
         {
-            StoreManager.Instance.ShowShop();
+            adsManager.onAdClosedGoToShop += () =>
+            {
+                if (StoreManager.Instance != null)
+                {
+                    _ControlMusic();
+                    StoreManager.Instance.ShowShop();
+                }
+            };
+            adsManager.ShowInterstitialAd();
         }
         else
         {
-            Debug.LogError("WaitBeforeNextMission: StoreManager.Instance is null, cannot show shop!");
+            if (StoreManager.Instance != null)
+            {
+                _ControlMusic();
+                StoreManager.Instance.ShowShop();
+            }
         }
+
     }
 
     public void ResetGameForNewLevel()
@@ -282,7 +298,11 @@ public class GameManager : MonoBehaviour
             countdownCoroutine = null;
         }
     }
+    public void _ControlMusic()
+    {
 
+        audioManager.background.Stop();
+    }
     public void ResumeGameAfterShop()
     {
         audioManager.background.Play();

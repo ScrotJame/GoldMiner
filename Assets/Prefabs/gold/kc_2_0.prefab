@@ -33,7 +33,8 @@ Transform:
   m_LocalPosition: {x: -0.9, y: -1.38, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5973666876406692607}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3556293062643637462
@@ -127,6 +128,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RewindObject: {fileID: 11400000, guid: 9a2ce7f16efd9f54492f699b630b73ea, type: 2}
   currentState: 0
+  health: 1
+  destroyEffect: {fileID: 0}
 --- !u!60 &3568068227743027888
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -209,3 +212,34 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!1 &3213214775192715011
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5973666876406692607}
+  m_Layer: 0
+  m_Name: GoldCenter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5973666876406692607
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3213214775192715011}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.02, y: 0.28, z: -0.007951108}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4189460273053502630}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

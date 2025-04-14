@@ -35,6 +35,7 @@ public class Pod : MonoBehaviour
     private Vector2 _screenBounds;
 
     AudioManager audioManager;
+
     private void Awake()
     {
         if (instance == null)
@@ -185,21 +186,21 @@ public class Pod : MonoBehaviour
                         if (gold != null)
                         {
                             Destroy(_transformPostion.gameObject);
-                            if (_animHook != null) { _animHook.SetBool("got", false);  }
+                            if (_animHook != null) { _animHook.SetBool("got", false); }
                             if (_animMiner != null) _animMiner.Play("MinerRewind");
                             int goldPoints = gold.RewindObject.point;
-                            
-                                if (Spawner.instance != null && Spawner.instance.IsDrugActive && gold.gameObject.name.Contains("kc_2_0"))
-                                {
-                                    goldPoints *= 2;
-                                }
 
-                                if (Spawner.instance != null && Spawner.instance.IsDrugActive && (gold.gameObject.name.Contains("Stone") || gold.gameObject.name.Contains("Stone2")))
-                                {
-                                    goldPoints *= 3;
-                                }
-                            
-                                if (gold.gameObject.name.Contains("tui_0"))
+                            if (Spawner.instance != null && Spawner.instance.IsDrugActive && gold.gameObject.name.Contains("kc_2_0"))
+                            {
+                                goldPoints *= 2;
+                            }
+
+                            if (Spawner.instance != null && Spawner.instance.IsDrugActive && (gold.gameObject.name.Contains("Stone") || gold.gameObject.name.Contains("Stone2")))
+                            {
+                                goldPoints *= 3;
+                            }
+
+                            if (gold.gameObject.name.Contains("tui_0"))
                             {
                                 blindBoxReward = blindBox.GetRewardType();
                                 ApplyBlindBoxReward(blindBoxReward);
@@ -212,6 +213,10 @@ public class Pod : MonoBehaviour
                                 ScoreControl.instance.AddScore(goldPoints);
                             }
                             audioManager.PlaySFX(audioManager.got);
+                            if (LinePod.instance != null)
+                            {
+                                LinePod.instance.ReleaseGold();
+                            }
                         }
                         else if (blindBox != null)
                         {
@@ -219,6 +224,10 @@ public class Pod : MonoBehaviour
                             Destroy(_transformPostion.gameObject);
                             if (_animHook != null) _animHook.SetBool("got", false);
                             if (_animMiner != null) _animMiner.Play("MinerRewind");
+                            if (LinePod.instance != null)
+                            {
+                                LinePod.instance.ReleaseGold();
+                            }
                         }
                         _transformPostion = null;
                         blindBoxReward = null;
@@ -232,6 +241,8 @@ public class Pod : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
+        if (_transformPostion != null) return;
+
         if (collision.gameObject.CompareTag("Gold") || collision.gameObject.CompareTag("TNT") || collision.gameObject.CompareTag("mouse"))
         {
             _state = StateMoc._rewind;
@@ -255,16 +266,47 @@ public class Pod : MonoBehaviour
             else if (gold != null && gold.RewindObject != null)
             {
                 _slow = gold.RewindObject.weight;
+
+                Transform goldCenter = null;
+                foreach (Transform child in collision.transform.GetComponentsInChildren<Transform>(true))
+                {
+                    if (child.name == "GoldCenter")
+                    {
+                        goldCenter = child;
+                        break;
+                    }
+                }
+
+                if (goldCenter != null)
+                {
+                    if (LinePod.instance != null)
+                    {
+                        LinePod.instance.SetTargetGold(goldCenter);
+                        Debug.Log("Đã gắn dây vào: " + goldCenter.name);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Không tìm thấy GoldCenter trong " + collision.name);
+                }
             }
 
-            Animator mouseAnim = mouse?.GetComponent<Animator>();
-            Animator goldAnim = gold?.GetComponent<Animator>();
-
-            if (mouseAnim != null || goldAnim != null)
+            if (_animHook != null)
             {
-                if (_animHook != null) _animHook.SetBool("got", true);
-                mouseAnim?.SetBool("is_got", true);
-                goldAnim?.SetBool("is_got", true);
+                _animHook.SetBool("got", true);
+            }
+
+            Animator mouseAnim = mouse != null ? mouse.GetComponent<Animator>() : null;
+            Animator goldAnim = gold != null ? gold.GetComponent<Animator>() : null;
+
+            if (mouseAnim != null)
+            {
+                mouseAnim.SetBool("is_got", true);
+            }
+
+            if (goldAnim != null)
+            {
+                goldAnim.SetBool("is_got", true);
             }
         }
     }
@@ -325,6 +367,11 @@ public class Pod : MonoBehaviour
                 Destroy(mouse.gameObject);
             }
             _transformPostion = null;
+
+            if (LinePod.instance != null)
+            {
+                LinePod.instance.ReleaseGold();
+            }
         }
 
         transform.position = _fistPosition;
@@ -400,6 +447,10 @@ public class Pod : MonoBehaviour
             _transformPostion = null;
             if (_animHook != null) _animHook.SetBool("got", false);
             if (_animMiner != null) _animMiner.Play("MinerRewind");
+            if (LinePod.instance != null)
+            {
+                LinePod.instance.ReleaseGold();
+            }
         }
     }
 }
