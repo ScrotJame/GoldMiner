@@ -39,7 +39,7 @@ public class LinePod : MonoBehaviour
         lineRenderer.material = blackMaterial;
 
         lineRenderer.sortingLayerName = "Default";
-        lineRenderer.sortingOrder = 5;
+        lineRenderer.sortingOrder = 0;
 
         _anim = hook.GetComponent<Animator>();
     }

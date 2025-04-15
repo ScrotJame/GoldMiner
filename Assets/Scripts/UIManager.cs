@@ -18,6 +18,8 @@ public class UIManager : MonoBehaviour
 
     public Button yesbutt;
     public Button nobutt;
+    public Button pauseButton;
+    public Button musicButton;
     // UI Notification
     public GameObject gameNotificationPanel;
     public GameObject menuGamePanel;
@@ -31,8 +33,10 @@ public class UIManager : MonoBehaviour
     public Transform popupParent;
 
     public int lastAdLevel = -2;
-    public GameObject adsRewardButton;
-    public int currentLevelIndex; 
+    public GameObject adsRewardButtonPrefab;
+    private GameObject adsRewardButtonInstance; 
+    public int currentLevelIndex;
+
 
     private Canvas uiCanvas;
 
@@ -46,42 +50,42 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        lastAdLevel = PlayerPrefs.GetInt("LastAdLevel", -2);
     }
 
     private void SetupCanvas()
     {
-        if (uiCanvas != null)
-        {
-            Destroy(uiCanvas);
-        }
-
-        uiCanvas = gameObject.GetComponent<Canvas>();
+        // Tìm Canvas chính trong scene
+        uiCanvas = FindObjectOfType<Canvas>();
         if (uiCanvas == null)
         {
-            uiCanvas = gameObject.AddComponent<Canvas>();
-        }
-        uiCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-        uiCanvas.worldCamera = Camera.main;
-        if (uiCanvas.worldCamera == null)
-        {
-            Debug.LogWarning("Không tìm thấy Main Camera khi tạo Canvas!");
+            GameObject canvasObj = new GameObject("Canvas");
+            uiCanvas = canvasObj.AddComponent<Canvas>();
+            uiCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+            uiCanvas.worldCamera = Camera.main;
+            if (uiCanvas.worldCamera == null)
+            {
+            }
         }
     }
 
     void Start()
     {
         InitializeButtons();
-        currentLevelIndex = GameManager.instance.currentLevel;
+        UpdateLevelIndex();
+        if (currentLevelIndex == 1)
+        {
+            lastAdLevel = -2;
+            PlayerPrefs.SetInt("LastAdLevel", lastAdLevel);
+            PlayerPrefs.Save();
+        }
         UpdateAdsRewardButton();
-        if (currentLevelIndex >= lastAdLevel + 2)
-        {
-            adsRewardButton.SetActive(true);
-        }
-        else
-        {
-            adsRewardButton.SetActive(false);
-        }
     }
+
+    private void UpdateLevelIndex()
+    {
+        currentLevelIndex = GameManager.instance != null ? GameManager.instance.currentLevel : 1;
+        }
 
     public void InitializeButtons()
     {
@@ -95,11 +99,42 @@ public class UIManager : MonoBehaviour
                 btn.interactable = true;
             }
         }
+        else
+        {
+            Debug.LogWarning("gameNotificationPanel là null!");
+        }
+        if (pauseButton != null)
+        {
+            pauseButton.onClick.RemoveAllListeners();
+            pauseButton.onClick.AddListener(() => HandleButtonClick("PauseButton"));
+        }
+        if (musicButton != null)
+        {
+            musicButton.onClick.RemoveAllListeners();
+            musicButton.onClick.AddListener(() => HandleButtonClick("MusicButton"));
+        }
     }
 
     void HandleButtonClick(string buttonName)
     {
-        Debug.Log("Nút được nhấn: " + buttonName);
+        Debug.Log($"Nút được nhấn: {buttonName}");
+        if (buttonName == "YesButt")
+        {
+            GameManager.instance?.PlayAgainButton();
+        }
+        else if (buttonName == "NoButt")
+        {
+            GameManager.instance?.HomeButton();
+        }
+        else if (buttonName == "StopButt")
+        {
+            Time.timeScale = 0;
+            if (menuGamePanel != null) menuGamePanel.SetActive(true);
+        }
+        else if (buttonName == "SoundToggleButton")
+        {
+            AudioListener.volume = AudioListener.volume > 0 ? 0 : 1;
+        }
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
@@ -112,13 +147,13 @@ public class UIManager : MonoBehaviour
             SetupCanvas();
             timeText = GameObject.Find("Time")?.GetComponent<Text>();
             dynamiteText = GameObject.Find("CountDynamite")?.GetComponent<Text>();
-            if (dynamiteText != null && string.IsNullOrEmpty(dynamiteText.text))
+            if (dynamiteText != null)
             {
-                dynamiteText.gameObject.SetActive(!string.IsNullOrEmpty(dynamiteText.text) && int.Parse(dynamiteText.text) > 0);
+                dynamiteText.gameObject.SetActive(!string.IsNullOrEmpty(dynamiteText.text) && int.TryParse(dynamiteText.text, out int count) && count > 0);
             }
             else
             {
-                dynamiteText.gameObject.SetActive(false);
+                dynamiteText?.gameObject.SetActive(false);
             }
             scoreText = GameObject.Find("Score")?.GetComponent<Text>();
             targetScoreText = GameObject.Find("target")?.GetComponent<Text>();
@@ -128,9 +163,9 @@ public class UIManager : MonoBehaviour
             menuGamePanel = GameObject.Find("MenuPause");
             missionPanel = GameObject.Find("NotifMission");
             missionTargetText = GameObject.Find("MissiontargetText")?.GetComponent<Text>();
+
+            // Xóa các UIManager trùng lặp
             UIManager[] uiManagers = FindObjectsOfType<UIManager>();
-            currentLevelIndex = GameManager.instance.currentLevel;
-            ResetAdsRewardButton();
             if (uiManagers.Length > 1)
             {
                 for (int i = 1; i < uiManagers.Length; i++)
@@ -138,6 +173,18 @@ public class UIManager : MonoBehaviour
                     Destroy(uiManagers[i].gameObject);
                 }
             }
+
+            UpdateLevelIndex();
+            if (currentLevelIndex == 1)
+            {
+                lastAdLevel = -2;
+                PlayerPrefs.SetInt("LastAdLevel", lastAdLevel);
+                PlayerPrefs.Save();
+                Debug.Log($"OnSceneLoaded - Reset lastAdLevel to -2 tại level 1");
+            }
+            Debug.Log($"OnSceneLoaded - Current Level: {currentLevelIndex}, Last Ad Level: {lastAdLevel}, GameManager Level: {(GameManager.instance != null ? GameManager.instance.currentLevel : -1)}");
+            UpdateAdsRewardButton();
+
             InitializeButtons();
             if (gameNotificationPanel != null)
             {
@@ -148,7 +195,6 @@ public class UIManager : MonoBehaviour
                     panelCanvas.sortingOrder = 10;
                 }
             }
-
             if (missionPanel != null)
             {
                 missionPanel.SetActive(true);
@@ -157,25 +203,18 @@ public class UIManager : MonoBehaviour
         }
         else if (scene.name == "MainMenu")
         {
-            Canvas[] existingCanvases = FindObjectsOfType<Canvas>();
-            foreach (Canvas canvas in existingCanvases)
-            {
-                if (canvas.gameObject != gameObject)
-                {
-                    if (uiCanvas != null)
-                    {
-                        Destroy(uiCanvas); 
-                    }
-                    Destroy(gameObject); 
-                    return; 
-                }
-            }
-
             ClearUIReferences();
             HidePanels();
             if (uiCanvas != null)
             {
-                uiCanvas.enabled = false; 
+                uiCanvas.enabled = false;
+            }
+            // Hủy adsRewardButton nếu tồn tại
+            if (adsRewardButtonInstance != null)
+            {
+                Destroy(adsRewardButtonInstance);
+                adsRewardButtonInstance = null;
+                Debug.Log("Hủy adsRewardButtonInstance trong MainMenu");
             }
         }
     }
@@ -198,6 +237,8 @@ public class UIManager : MonoBehaviour
             if (gameNotificationPanel != null)
             {
                 gameNotificationPanel.SetActive(true);
+                if (yesbutt != null) yesbutt.gameObject.SetActive(true);
+                if (nobutt != null) nobutt.gameObject.SetActive(true);
                 InitializeButtons();
             }
         }
@@ -253,7 +294,6 @@ public class UIManager : MonoBehaviour
         missionPanel = null;
         missionTargetText = null;
         popupParent = null;
-        adsRewardButton = null;
     }
 
     public void HidePanels()
@@ -262,10 +302,11 @@ public class UIManager : MonoBehaviour
         if (gameNotificationPanel != null) gameNotificationPanel.SetActive(false);
         if (missionPanel != null) missionPanel.SetActive(false);
     }
+
     public void HideButton()
     {
-        yesbutt.gameObject.SetActive(false);
-        nobutt.gameObject.SetActive(false);
+        if (yesbutt != null) yesbutt.gameObject.SetActive(false);
+        if (nobutt != null) nobutt.gameObject.SetActive(false);
     }
 
     public void UpdateScoreUI(int score)
@@ -282,43 +323,95 @@ public class UIManager : MonoBehaviour
     {
         if (highScoreText != null) highScoreText.text = "" + highScore;
     }
+
+    private bool CanUseAdsReward()
+    {
+        UpdateLevelIndex();
+        int currentLevel = currentLevelIndex;
+        bool canUse = lastAdLevel == -2 || currentLevel >= lastAdLevel + 2;
+        return canUse;
+    }
+
     public void UpdateAdsRewardButton()
     {
-        if (currentLevelIndex >= lastAdLevel + 2)
+        UpdateLevelIndex();
+        bool canUse = CanUseAdsReward();
+       
+        if (canUse)
         {
-            adsRewardButton.SetActive(true);
-            Debug.Log("Show button");
-        }
-        else
-        {
-            adsRewardButton.SetActive(false);
-        }
-    }
-    public void ResetAdsRewardButton()
-    {
-        if (adsRewardButton != null)
-        {
-            // Kích hoạt nút nếu cấp độ hiện tại lớn hơn hoặc bằng cấp độ quảng cáo cuối cùng + 2
-            if (currentLevelIndex >= lastAdLevel + 2)
+            if (adsRewardButtonInstance == null && adsRewardButtonPrefab != null)
             {
-                adsRewardButton.SetActive(true);
-                Debug.Log("AdsRewardButton activated for level: " + currentLevelIndex);
+                if (uiCanvas == null)
+                {
+                    SetupCanvas();
+                }
+                if (uiCanvas == null)
+                {
+                    Debug.LogError("uiCanvas vẫn là null sau khi gọi SetupCanvas!");
+                    return;
+                }
+                adsRewardButtonInstance = Instantiate(adsRewardButtonPrefab, uiCanvas.transform);
+                adsRewardButtonInstance.name = "AdsRewardButtonInstance";
+                Debug.Log($"Instantiate adsRewardButtonInstance tại level {currentLevelIndex}, Parent: {adsRewardButtonInstance.transform.parent.name}");
+
+                Button buttonComponent = adsRewardButtonInstance.GetComponent<Button>();
+                if (buttonComponent != null)
+                {
+                    buttonComponent.onClick.RemoveAllListeners();
+                    buttonComponent.onClick.AddListener(OnClickAdsReward);
+                    buttonComponent.interactable = true;
+                    Debug.Log($"Gán OnClick cho adsRewardButtonInstance, interactable: {buttonComponent.interactable}");
+                }
+                else
+                {
+                    Debug.LogError("adsRewardButtonPrefab không có Button component!");
+                }
+            }
+            else if (adsRewardButtonInstance != null)
+            {
+                adsRewardButtonInstance.SetActive(true);
+                Debug.Log($"Kích hoạt adsRewardButtonInstance tại level {currentLevelIndex}, Parent: {adsRewardButtonInstance.transform.parent.name}");
             }
             else
             {
-                adsRewardButton.SetActive(false);
-                Debug.Log("AdsRewardButton deactivated for level: " + currentLevelIndex);
+                Debug.LogError("adsRewardButtonPrefab là null! Vui lòng gán prefab trong Inspector.");
             }
         }
         else
         {
-            Debug.LogWarning("AdsRewardButton not found!");
+            if (adsRewardButtonInstance != null)
+            {
+                Destroy(adsRewardButtonInstance);
+                adsRewardButtonInstance = null;
+                Debug.Log($"Hủy adsRewardButtonInstance tại level {currentLevelIndex}");
+            }
         }
     }
+
     public void OnClickAdsReward()
     {
-        adsRewardButton.SetActive(false);
+        if (adsRewardButtonInstance == null)
+        {
+            Debug.LogError("adsRewardButtonInstance là null khi nhấn!");
+            UpdateAdsRewardButton(); 
+            return;
+        }
+
+        if (!CanUseAdsReward())
+        {
+            Debug.Log($"AdsRewardButton không thể sử dụng đến level {lastAdLevel + 2}");
+            return;
+        }
+
+        UpdateLevelIndex();
         lastAdLevel = currentLevelIndex;
+        PlayerPrefs.SetInt("LastAdLevel", lastAdLevel);
+        PlayerPrefs.Save();
+        if (adsRewardButtonInstance != null)
+        {
+            Destroy(adsRewardButtonInstance);
+            adsRewardButtonInstance = null;
+        }
 
         GoogleAdsManager adsManager = FindObjectOfType<GoogleAdsManager>();
         if (adsManager != null)
@@ -327,9 +420,20 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("GoogleAdsManager not found!");
-            UpdateAdsRewardButton();
+            Debug.LogError("GoogleAdsManager không tìm thấy!");
         }
     }
 
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
+        }
+        if (adsRewardButtonInstance != null)
+        {
+            Destroy(adsRewardButtonInstance);
+            adsRewardButtonInstance = null;
+        }
+    }
 }

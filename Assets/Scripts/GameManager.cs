@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,8 +11,8 @@ public class GameManager : MonoBehaviour
     public int currentLevel = 1;
     public int goldAmount = 0;
 
-    private int initialTime =15;
-    private int timeLeft;
+    private int initialTime = 15;
+    public int timeLeft;
     private int pendingScore;
     private bool shouldStartNextMission = false;
     private bool returningFromShop = false;
@@ -21,7 +22,6 @@ public class GameManager : MonoBehaviour
     private Spawner spawner;
     private Pod pod;
     public int _nextScore;
-
     AudioManager audioManager;
     private void Awake()
     {
@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         audioManager = GameObject.FindGameObjectWithTag("Audio")?.GetComponent<AudioManager>();
+        Debug.Log($"GameManager Awake - Current Level: {currentLevel}");
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
@@ -46,7 +47,6 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-
         if (countdownCoroutine != null) StopCoroutine(countdownCoroutine);
 
         UIManager.instance?.HidePanels();
@@ -142,6 +142,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(HideMissionPanelAndContinue(3f));
         pod?.StopMovement();
         returningFromShop = false;
+        UIManager.instance?.UpdateAdsRewardButton();
     }
 
     private IEnumerator HideMissionPanelAndContinue(float delay)
@@ -154,6 +155,31 @@ public class GameManager : MonoBehaviour
     {
         if (time <= 0)
         {
+            // Xử lý vàng hoặc vật phẩm đang gắp
+            if (pod != null && pod._state == Pod.StateMoc._rewind && pod._transformPostion != null)
+            {
+                // Hủy vật phẩm mà không cộng điểm
+                GoldBase gold = pod._transformPostion.GetComponent<GoldBase>();
+                Mouse mouse = pod._transformPostion.GetComponent<Mouse>();
+                BlindBox blindBox = pod._transformPostion.GetComponent<BlindBox>();
+
+                if (gold != null || mouse != null || blindBox != null)
+                {
+                    Destroy(pod._transformPostion.gameObject);
+                    Debug.Log($"Destroyed item {pod._transformPostion.name} due to time out, no points awarded");
+                }
+
+                pod._transformPostion = null;
+                if (LinePod.instance != null)
+                {
+                    LinePod.instance.ReleaseGold();
+                }
+                if (pod._animHook != null)
+                {
+                   pod._animHook.Play("hook");
+                }
+            }
+
             pod?.ResetHookPosition();
             if (returningFromShop)
             {
@@ -172,7 +198,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                UIManager.instance?.InitializeButtons(); 
+                UIManager.instance?.InitializeButtons();
                 audioManager.background.Stop();
                 audioManager.PlaySFX(audioManager.lost);
                 ItemManager.Instance.ClearAllItems();
@@ -182,7 +208,6 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
     private IEnumerator WaitBeforeNextMission(int score)
     {
         yield return new WaitForSeconds(2f);
@@ -200,7 +225,7 @@ public class GameManager : MonoBehaviour
         }
 
         GoogleAdsManager adsManager = FindObjectOfType<GoogleAdsManager>();
-        if (adsManager != null && adsManager.IsBannerAdLoaded() && currentLevel%2 == 0)
+        if (adsManager != null && adsManager.IsBannerAdLoaded() && currentLevel % 2 == 0)
         {
             adsManager.onAdClosedGoToShop += () =>
             {
@@ -220,7 +245,6 @@ public class GameManager : MonoBehaviour
                 StoreManager.Instance.ShowShop();
             }
         }
-
     }
 
     public void ResetGameForNewLevel()
@@ -242,6 +266,7 @@ public class GameManager : MonoBehaviour
         pod?.ResumeMovement();
         Time.timeScale = 1;
         StartCountdown();
+        UIManager.instance?.UpdateAdsRewardButton();
     }
 
     public void HomeButton()
@@ -251,7 +276,6 @@ public class GameManager : MonoBehaviour
         ItemManager.Instance.ClearAllItems();
         SceneManager.LoadScene("MainMenu");
     }
-
 
     public void PlayAgainButton()
     {
@@ -298,23 +322,23 @@ public class GameManager : MonoBehaviour
             countdownCoroutine = null;
         }
     }
+
     public void _ControlMusic()
     {
-
         audioManager.background.Stop();
     }
+
     public void ResumeGameAfterShop()
     {
         audioManager.background.Play();
         if (pod == null || pod.Equals(null))
         {
-            if (pod == null)
-            {
-                return;
-            }
+            Debug.LogWarning("Pod is null in ResumeGameAfterShop!");
+            return;
         }
 
         pod?.ResumeMovement();
+        pod.ResetHookPosition();
         UIManager.instance?.HidePanels();
         Time.timeScale = 1;
         timeLeft = initialTime;
@@ -327,10 +351,9 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            Debug.LogError("ScoreControl.instance is null in ResumeGameAfterShop!");
             return;
         }
-
-        StartCountdown();
     }
 
     public void CollectGold(int amount)

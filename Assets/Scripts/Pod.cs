@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using static GoldBase;
 
@@ -25,7 +26,7 @@ public class Pod : MonoBehaviour
     private int dynamiteCount = 0;
     private string blindBoxReward;
 
-    private Animator _animHook;
+    public Animator _animHook;
     [SerializeField] public float _scrollSpeed = 2.0f;
     [SerializeField] public float _rotationSpeed = 1.25f;
     [SerializeField] public float _slow;
@@ -47,7 +48,66 @@ public class Pod : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio")?.GetComponent<AudioManager>();
+
+        // Gán _animHook từ minerTransform
+        if (minerTransform != null)
+        {
+            _animMiner = minerTransform.GetComponent<Animator>();
+            Transform moc_0 = FindChildByName(minerTransform, "moc_0");
+            if (moc_0 != null)
+            {
+                Transform hook = FindChildByName(moc_0, "Hook");
+                if (hook != null)
+                {
+                    _animHook = hook.GetComponent<Animator>();
+                    if (_animHook != null)
+                    {
+                        Debug.Log("Successfully assigned _animHook in Awake");
+                    }
+                    else
+                    {
+                        Debug.LogError("Hook GameObject found, but Animator component is missing!");
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Could not find Hook in moc_0!");
+                }
+            }
+            else
+            {
+                Debug.LogError("Could not find moc_0 in minerTransform!");
+            }
+        }
+        else
+        {
+            Debug.LogError("minerTransform is not assigned in Inspector!");
+        }
+    }
+
+    private void Start()
+    {
+        _originalScrollSpeed = _scrollSpeed;
+        Time.timeScale = 1;
+        _state = StateMoc._rotation;
+
+        _fistPosition = transform.position;
+        _fistPosition.x = Mathf.Clamp(_fistPosition.x, -_screenBounds.x + 0.5f, _screenBounds.x - 0.5f);
+        _fistPosition.y = Mathf.Clamp(_fistPosition.y, -_screenBounds.y + 0.5f, _screenBounds.y - 0.5f);
+
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _anim = GetComponent<Animator>();
+        _audio = GetComponent<AudioSource>();
+        scrollClip = Resources.Load<AudioClip>("Sound/scroll");
+        gotClip = Resources.Load<AudioClip>("Sound/got");
+        useBoomClip = Resources.Load<AudioClip>("Sound/useBoom");
+        _mainCamera = Camera.main;
+        _fistPosition = transform.position;
+
+        _screenBounds = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, -_mainCamera.transform.position.z));
+
+        ResetHookPosition();
     }
 
     private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
@@ -60,6 +120,7 @@ public class Pod : MonoBehaviour
         if (scene.name == "GamePlay")
         {
             gameObject.SetActive(true);
+            _animHook.SetBool("got",false);
         }
         else if (scene.name == "Store")
         {
@@ -67,34 +128,7 @@ public class Pod : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        _originalScrollSpeed = _scrollSpeed;
-        Time.timeScale = 1;
-        _state = StateMoc._rotation;
-
-        if (minerTransform != null)
-        {
-            _animMiner = minerTransform.GetComponent<Animator>();
-            Transform moc_0 = FindChildByName(minerTransform, "moc_0");
-            if (moc_0 != null)
-            {
-                Transform hook = FindChildByName(moc_0, "Hook");
-                if (hook != null) _animHook = hook.GetComponent<Animator>();
-            }
-        }
-
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-        _anim = GetComponent<Animator>();
-        _audio = GetComponent<AudioSource>();
-        scrollClip = Resources.Load<AudioClip>("Sound/scroll");
-        gotClip = Resources.Load<AudioClip>("Sound/got");
-        useBoomClip = Resources.Load<AudioClip>("Sound/useBoom");
-        _mainCamera = Camera.main;
-        _fistPosition = transform.position;
-
-        _screenBounds = _mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, -_mainCamera.transform.position.z));
-    }
+  
 
     Transform FindChildByName(Transform parent, string name)
     {
@@ -158,7 +192,8 @@ public class Pod : MonoBehaviour
         {
             case StateMoc._rotation:
                 if (_animMiner != null) _animMiner.Play("MinerBaseState");
-                if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
+                if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)&&
+                !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
                 {
                     _state = StateMoc._click;
                 }
@@ -174,7 +209,7 @@ public class Pod : MonoBehaviour
                 break;
             case StateMoc._rewind:
                 transform.Translate(Vector3.up * (_scrollSpeed - _slow) * Time.deltaTime);
-                float tolerance = 0.1f;
+                float tolerance = 0.55f;
                 if (Vector3.Distance(transform.position, _fistPosition) < tolerance)
                 {
                     _slow = 0;
@@ -233,6 +268,8 @@ public class Pod : MonoBehaviour
                         blindBoxReward = null;
                     }
                     _state = StateMoc._rotation;
+                    _angle = 0;
+                    transform.rotation = Quaternion.identity;
                     if (_animMiner != null) _animMiner.Play("MinerBaseState");
                 }
                 break;
@@ -282,7 +319,6 @@ public class Pod : MonoBehaviour
                     if (LinePod.instance != null)
                     {
                         LinePod.instance.SetTargetGold(goldCenter);
-                        Debug.Log("Đã gắn dây vào: " + goldCenter.name);
                     }
                 }
                 else
@@ -362,9 +398,11 @@ public class Pod : MonoBehaviour
         if (_transformPostion != null)
         {
             Mouse mouse = _transformPostion.GetComponent<Mouse>();
-            if (mouse != null)
+            GoldBase gold = _transformPostion.GetComponent<GoldBase>();
+            BlindBox blindBox = _transformPostion.GetComponent<BlindBox>();
+            if (mouse != null || gold != null || blindBox != null)
             {
-                Destroy(mouse.gameObject);
+                Destroy(_transformPostion.gameObject);
             }
             _transformPostion = null;
 
@@ -381,8 +419,20 @@ public class Pod : MonoBehaviour
         _slow = 0;
         _flagCollect = false;
 
-        if (_anim != null) _anim.SetBool("got", false);
-        if (_animMiner != null) _animMiner.Play("MinerBaseState");
+        if (_animHook != null)
+        {
+            _animHook.SetBool("got", false);
+            _animHook.Play("hook");
+        }
+
+        if (_anim != null)
+        {
+            _anim.SetBool("got", false);
+        }
+        if (_animMiner != null)
+        {
+            _animMiner.Play("MinerBaseState");
+        }
     }
 
     public bool UseDynamite()
